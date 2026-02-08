@@ -1,32 +1,46 @@
 """Session management for conversation history."""
 
 import json
+import os
+import tempfile
+from collections import OrderedDict
 from pathlib import Path
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any
 
 from loguru import logger
 
-from nanobot.utils.helpers import ensure_dir, safe_filename
+from nanobot.utils.helpers import ensure_dir
+from nanobot.security.validators import safe_filename
+
+# Session limits
+MAX_MESSAGE_SIZE = 100 * 1024  # 100KB per message
+MAX_MESSAGES_PER_SESSION = 1000
+MAX_CACHED_SESSIONS = 100
+SESSION_EXPIRY_DAYS = 30
 
 
 @dataclass
 class Session:
     """
     A conversation session.
-    
+
     Stores messages in JSONL format for easy reading and persistence.
     """
-    
+
     key: str  # channel:chat_id
     messages: list[dict[str, Any]] = field(default_factory=list)
     created_at: datetime = field(default_factory=datetime.now)
     updated_at: datetime = field(default_factory=datetime.now)
     metadata: dict[str, Any] = field(default_factory=dict)
-    
+
     def add_message(self, role: str, content: str, **kwargs: Any) -> None:
-        """Add a message to the session."""
+        """Add a message to the session, enforcing limits."""
+        # Enforce message size limit
+        if len(content.encode("utf-8")) > MAX_MESSAGE_SIZE:
+            content = content[:MAX_MESSAGE_SIZE] + "\n... (truncated)"
+
         msg = {
             "role": role,
             "content": content,
@@ -35,23 +49,27 @@ class Session:
         }
         self.messages.append(msg)
         self.updated_at = datetime.now()
-    
+
+        # Enforce max messages per session
+        if len(self.messages) > MAX_MESSAGES_PER_SESSION:
+            self.messages = self.messages[-MAX_MESSAGES_PER_SESSION:]
+
     def get_history(self, max_messages: int = 50) -> list[dict[str, Any]]:
         """
         Get message history for LLM context.
-        
+
         Args:
             max_messages: Maximum messages to return.
-        
+
         Returns:
             List of messages in LLM format.
         """
         # Get recent messages
         recent = self.messages[-max_messages:] if len(self.messages) > max_messages else self.messages
-        
+
         # Convert to LLM format (just role and content)
         return [{"role": m["role"], "content": m["content"]} for m in recent]
-    
+
     def clear(self) -> None:
         """Clear all messages in the session."""
         self.messages = []
@@ -61,127 +79,155 @@ class Session:
 class SessionManager:
     """
     Manages conversation sessions.
-    
+
     Sessions are stored as JSONL files in the sessions directory.
+    Uses LRU cache with bounded size.
     """
-    
+
     def __init__(self, workspace: Path):
         self.workspace = workspace
         self.sessions_dir = ensure_dir(Path.home() / ".nanobot" / "sessions")
-        self._cache: dict[str, Session] = {}
-    
+        self._cache: OrderedDict[str, Session] = OrderedDict()
+
     def _get_session_path(self, key: str) -> Path:
         """Get the file path for a session."""
         safe_key = safe_filename(key.replace(":", "_"))
         return self.sessions_dir / f"{safe_key}.jsonl"
-    
+
+    def _evict_cache(self) -> None:
+        """Evict oldest entries if cache exceeds max size."""
+        while len(self._cache) > MAX_CACHED_SESSIONS:
+            self._cache.popitem(last=False)
+
     def get_or_create(self, key: str) -> Session:
         """
         Get an existing session or create a new one.
-        
+
         Args:
             key: Session key (usually channel:chat_id).
-        
+
         Returns:
             The session.
         """
-        # Check cache
+        # Check cache (move to end for LRU)
         if key in self._cache:
+            self._cache.move_to_end(key)
             return self._cache[key]
-        
+
         # Try to load from disk
         session = self._load(key)
         if session is None:
             session = Session(key=key)
-        
+
         self._cache[key] = session
+        self._evict_cache()
         return session
-    
+
     def _load(self, key: str) -> Session | None:
         """Load a session from disk."""
         path = self._get_session_path(key)
-        
+
         if not path.exists():
             return None
-        
+
         try:
             messages = []
             metadata = {}
             created_at = None
-            
+
             with open(path) as f:
                 for line in f:
                     line = line.strip()
                     if not line:
                         continue
-                    
+
                     data = json.loads(line)
-                    
+
                     if data.get("_type") == "metadata":
                         metadata = data.get("metadata", {})
                         created_at = datetime.fromisoformat(data["created_at"]) if data.get("created_at") else None
                     else:
                         messages.append(data)
-            
-            return Session(
+
+            session = Session(
                 key=key,
                 messages=messages,
                 created_at=created_at or datetime.now(),
                 metadata=metadata
             )
+
+            # Check expiry
+            if session.updated_at < datetime.now() - timedelta(days=SESSION_EXPIRY_DAYS):
+                logger.info(f"Session {key} expired, creating new")
+                path.unlink(missing_ok=True)
+                return None
+
+            return session
         except Exception as e:
             logger.warning(f"Failed to load session {key}: {e}")
             return None
-    
+
     def save(self, session: Session) -> None:
-        """Save a session to disk."""
+        """Save a session to disk using atomic write."""
         path = self._get_session_path(session.key)
-        
-        with open(path, "w") as f:
-            # Write metadata first
-            metadata_line = {
-                "_type": "metadata",
-                "created_at": session.created_at.isoformat(),
-                "updated_at": session.updated_at.isoformat(),
-                "metadata": session.metadata
-            }
-            f.write(json.dumps(metadata_line) + "\n")
-            
-            # Write messages
-            for msg in session.messages:
-                f.write(json.dumps(msg) + "\n")
-        
+
+        # Atomic write: temp file + rename
+        fd, tmp_path = tempfile.mkstemp(dir=str(path.parent), suffix=".tmp")
+        try:
+            with os.fdopen(fd, "w") as f:
+                # Write metadata first
+                metadata_line = {
+                    "_type": "metadata",
+                    "created_at": session.created_at.isoformat(),
+                    "updated_at": session.updated_at.isoformat(),
+                    "metadata": session.metadata
+                }
+                f.write(json.dumps(metadata_line) + "\n")
+
+                # Write messages
+                for msg in session.messages:
+                    f.write(json.dumps(msg) + "\n")
+
+            os.replace(tmp_path, str(path))
+        except Exception:
+            try:
+                os.unlink(tmp_path)
+            except OSError:
+                pass
+            raise
+
         self._cache[session.key] = session
-    
+        self._evict_cache()
+
     def delete(self, key: str) -> bool:
         """
         Delete a session.
-        
+
         Args:
             key: Session key.
-        
+
         Returns:
             True if deleted, False if not found.
         """
         # Remove from cache
         self._cache.pop(key, None)
-        
+
         # Remove file
         path = self._get_session_path(key)
         if path.exists():
             path.unlink()
             return True
         return False
-    
+
     def list_sessions(self) -> list[dict[str, Any]]:
         """
         List all sessions.
-        
+
         Returns:
             List of session info dicts.
         """
         sessions = []
-        
+
         for path in self.sessions_dir.glob("*.jsonl"):
             try:
                 # Read just the metadata line
@@ -198,5 +244,5 @@ class SessionManager:
                             })
             except Exception:
                 continue
-        
+
         return sorted(sessions, key=lambda x: x.get("updated_at", ""), reverse=True)

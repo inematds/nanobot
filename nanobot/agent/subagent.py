@@ -17,10 +17,13 @@ from nanobot.agent.tools.shell import ExecTool
 from nanobot.agent.tools.web import WebSearchTool, WebFetchTool
 
 
+MAX_CONCURRENT_SUBAGENTS = 5
+
+
 class SubagentManager:
     """
     Manages background subagent execution.
-    
+
     Subagents are lightweight agent instances that run in the background
     to handle specific tasks. They share the same LLM provider but have
     isolated context and a focused system prompt.
@@ -65,6 +68,10 @@ class SubagentManager:
         Returns:
             Status message indicating the subagent was started.
         """
+        # Enforce concurrency limit
+        if len(self._running_tasks) >= MAX_CONCURRENT_SUBAGENTS:
+            return f"Error: Maximum of {MAX_CONCURRENT_SUBAGENTS} concurrent subagents reached. Please wait for one to complete."
+
         task_id = str(uuid.uuid4())[:8]
         display_label = label or task[:30] + ("..." if len(task) > 30 else "")
         

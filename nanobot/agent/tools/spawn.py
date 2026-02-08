@@ -46,6 +46,7 @@ class SpawnTool(Tool):
                 "task": {
                     "type": "string",
                     "description": "The task for the subagent to complete",
+                    "maxLength": 10000,
                 },
                 "label": {
                     "type": "string",

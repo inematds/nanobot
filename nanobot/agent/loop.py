@@ -19,7 +19,20 @@ from nanobot.agent.tools.message import MessageTool
 from nanobot.agent.tools.spawn import SpawnTool
 from nanobot.agent.tools.cron import CronTool
 from nanobot.agent.subagent import SubagentManager
+from nanobot.security.ratelimit import RateLimiter
+from nanobot.security.sanitize import sanitize_error, sanitize_tool_result
 from nanobot.session.manager import SessionManager
+
+# Tool name -> rate limit operation mapping
+_TOOL_RATE_MAP = {
+    "exec": "tool_exec",
+    "web_fetch": "web_fetch",
+    "web_search": "web_fetch",
+    "write_file": "file_write",
+    "edit_file": "file_write",
+    "spawn": "subagent_spawn",
+    "cron": "cron_job",
+}
 
 
 class AgentLoop:
@@ -72,6 +85,7 @@ class AgentLoop:
             restrict_to_workspace=restrict_to_workspace,
         )
         
+        self.rate_limiter = RateLimiter()
         self._running = False
         self._register_default_tools()
     
@@ -127,11 +141,12 @@ class AgentLoop:
                         await self.bus.publish_outbound(response)
                 except Exception as e:
                     logger.error(f"Error processing message: {e}")
-                    # Send error response
+                    # Send sanitized error response
+                    safe_err = sanitize_error(e)
                     await self.bus.publish_outbound(OutboundMessage(
                         channel=msg.channel,
                         chat_id=msg.chat_id,
-                        content=f"Sorry, I encountered an error: {str(e)}"
+                        content=f"Sorry, I encountered an error: {safe_err}"
                     ))
             except asyncio.TimeoutError:
                 continue
@@ -156,6 +171,12 @@ class AgentLoop:
         if msg.channel == "system":
             return await self._process_system_message(msg)
         
+        # Rate limit check
+        if not self.rate_limiter.check(msg.session_key, "channel_message"):
+            limit_msg = self.rate_limiter.get_limit_message("channel_message")
+            logger.warning(f"Rate limited: {msg.session_key} — {limit_msg}")
+            return OutboundMessage(channel=msg.channel, chat_id=msg.chat_id, content=limit_msg)
+
         preview = msg.content[:80] + "..." if len(msg.content) > 80 else msg.content
         logger.info(f"Processing message from {msg.channel}:{msg.sender_id}: {preview}")
         
@@ -217,11 +238,19 @@ class AgentLoop:
                     reasoning_content=response.reasoning_content,
                 )
                 
-                # Execute tools
+                # Execute tools with rate limiting
                 for tool_call in response.tool_calls:
-                    args_str = json.dumps(tool_call.arguments, ensure_ascii=False)
-                    logger.info(f"Tool call: {tool_call.name}({args_str[:200]})")
-                    result = await self.tools.execute(tool_call.name, tool_call.arguments)
+                    # Check rate limit for this tool type
+                    rate_op = _TOOL_RATE_MAP.get(tool_call.name)
+                    if rate_op and not self.rate_limiter.check(msg.session_key, rate_op):
+                        result = self.rate_limiter.get_limit_message(rate_op)
+                        logger.warning(f"Rate limited tool: {tool_call.name} for {msg.session_key}")
+                    else:
+                        args_str = json.dumps(tool_call.arguments, ensure_ascii=False)
+                        logger.info(f"Tool call: {tool_call.name}({args_str[:200]})")
+                        result = await self.tools.execute(tool_call.name, tool_call.arguments)
+                    # Sanitize tool result before adding to LLM context
+                    result = sanitize_tool_result(result)
                     messages = self.context.add_tool_result(
                         messages, tool_call.id, tool_call.name, result
                     )
@@ -229,7 +258,7 @@ class AgentLoop:
                 # No tool calls, we're done
                 final_content = response.content
                 break
-        
+
         if final_content is None:
             final_content = "I've completed processing but have no response to give."
         

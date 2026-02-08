@@ -759,5 +759,88 @@ def status():
                 console.print(f"{spec.label}: {'[green]✓[/green]' if has_key else '[dim]not set[/dim]'}")
 
 
+@app.command("security-check")
+def security_check():
+    """Check security configuration and report issues."""
+    from nanobot.config.loader import load_config, get_config_path
+
+    config_path = get_config_path()
+    config = load_config()
+
+    console.print(f"{__logo__} Security Check\n")
+
+    issues: list[str] = []
+    warnings: list[str] = []
+
+    # 1. Check restrict_to_workspace
+    if config.tools.restrict_to_workspace:
+        console.print("[green]  PASS[/green] restrict_to_workspace is enabled")
+    else:
+        issues.append("restrict_to_workspace is disabled — tools can access files outside workspace")
+        console.print("[red]  FAIL[/red] restrict_to_workspace is disabled")
+
+    # 2. Check gateway host binding
+    if config.gateway.host in ("127.0.0.1", "localhost", "::1"):
+        console.print(f"[green]  PASS[/green] Gateway binds to {config.gateway.host} (localhost only)")
+    else:
+        warnings.append(f"Gateway binds to {config.gateway.host} — consider using 127.0.0.1 + reverse proxy")
+        console.print(f"[yellow]  WARN[/yellow] Gateway binds to {config.gateway.host}")
+
+    # 3. Check allow_from lists for enabled channels
+    channel_configs = [
+        ("whatsapp", config.channels.whatsapp),
+        ("telegram", config.channels.telegram),
+        ("discord", config.channels.discord),
+        ("feishu", config.channels.feishu),
+        ("dingtalk", config.channels.dingtalk),
+    ]
+    for name, ch in channel_configs:
+        if not ch.enabled:
+            continue
+        allow = getattr(ch, "allow_from", [])
+        if allow:
+            console.print(f"[green]  PASS[/green] {name}: allowFrom has {len(allow)} entries")
+        else:
+            issues.append(f"{name} is enabled but allowFrom is empty — all access denied (fail-secure)")
+            console.print(f"[yellow]  WARN[/yellow] {name}: allowFrom is empty (all access denied)")
+
+    # 4. Check config file permissions
+    import stat
+    if config_path.exists():
+        try:
+            mode = config_path.stat().st_mode
+            if mode & stat.S_IROTH:
+                issues.append(f"Config file {config_path} is world-readable")
+                console.print(f"[red]  FAIL[/red] Config is world-readable: {config_path}")
+            elif mode & stat.S_IRGRP:
+                warnings.append(f"Config file {config_path} is group-readable")
+                console.print(f"[yellow]  WARN[/yellow] Config is group-readable: {config_path}")
+            else:
+                console.print(f"[green]  PASS[/green] Config file permissions OK")
+        except OSError:
+            console.print(f"[yellow]  WARN[/yellow] Could not check config file permissions")
+
+    # 5. Check for API keys configured
+    has_key = config.get_api_key() is not None
+    if has_key:
+        console.print("[green]  PASS[/green] At least one API key configured")
+    else:
+        warnings.append("No API key configured")
+        console.print("[yellow]  WARN[/yellow] No API key configured")
+
+    # Summary
+    console.print("")
+    if issues:
+        console.print(f"[red]Found {len(issues)} issue(s):[/red]")
+        for issue in issues:
+            console.print(f"  - {issue}")
+    if warnings:
+        console.print(f"[yellow]Found {len(warnings)} warning(s):[/yellow]")
+        for warning in warnings:
+            console.print(f"  - {warning}")
+    if not issues and not warnings:
+        console.print("[green]All checks passed![/green]")
+
+
 if __name__ == "__main__":
     app()

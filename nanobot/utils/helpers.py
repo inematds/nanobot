@@ -67,12 +67,9 @@ def truncate_string(s: str, max_len: int = 100, suffix: str = "...") -> str:
 
 
 def safe_filename(name: str) -> str:
-    """Convert a string to a safe filename."""
-    # Replace unsafe characters
-    unsafe = '<>:"/\\|?*'
-    for char in unsafe:
-        name = name.replace(char, "_")
-    return name.strip()
+    """Convert a string to a safe filename. Delegates to security module."""
+    from nanobot.security.validators import safe_filename as _safe_filename
+    return _safe_filename(name)
 
 
 def parse_session_key(key: str) -> tuple[str, str]:

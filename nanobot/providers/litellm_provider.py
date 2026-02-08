@@ -39,6 +39,9 @@ class LiteLLMProvider(LLMProvider):
         self.is_aihubmix = bool(self._gateway and self._gateway.name == "aihubmix")
         self.is_vllm = bool(self._gateway and self._gateway.is_local)
         
+        # Store api_key for direct passing to litellm calls
+        self._direct_api_key = api_key
+
         # Configure environment variables
         if api_key:
             self._setup_env(api_key, api_base, default_model)
@@ -131,6 +134,10 @@ class LiteLLMProvider(LLMProvider):
         # Apply model-specific overrides (e.g. kimi-k2.5 temperature)
         self._apply_model_overrides(model, kwargs)
         
+        # Pass api_key directly to litellm call (avoids relying solely on env vars)
+        if self._direct_api_key:
+            kwargs["api_key"] = self._direct_api_key
+
         # Pass api_base directly for custom endpoints (vLLM, etc.)
         if self.api_base:
             kwargs["api_base"] = self.api_base
@@ -147,9 +154,11 @@ class LiteLLMProvider(LLMProvider):
             response = await acompletion(**kwargs)
             return self._parse_response(response)
         except Exception as e:
-            # Return error as content for graceful handling
+            # Sanitize exception before returning as content
+            from nanobot.security.sanitize import sanitize_error
+            safe_err = sanitize_error(e)
             return LLMResponse(
-                content=f"Error calling LLM: {str(e)}",
+                content=f"Error calling LLM: {safe_err}",
                 finish_reason="error",
             )
     

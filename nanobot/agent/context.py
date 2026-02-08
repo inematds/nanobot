@@ -10,14 +10,20 @@ from nanobot.agent.memory import MemoryStore
 from nanobot.agent.skills import SkillsLoader
 
 
+# Resource limits for context building
+MAX_BOOTSTRAP_FILE_SIZE = 500 * 1024   # 500KB per bootstrap file
+MAX_IMAGE_SIZE = 5 * 1024 * 1024       # 5MB per image
+MAX_IMAGES_PER_MESSAGE = 5
+
+
 class ContextBuilder:
     """
     Builds the context (system prompt + messages) for the agent.
-    
+
     Assembles bootstrap files, memory, skills, and conversation history
     into a coherent prompt for the LLM.
     """
-    
+
     BOOTSTRAP_FILES = ["AGENTS.md", "SOUL.md", "USER.md", "TOOLS.md", "IDENTITY.md"]
     
     def __init__(self, workspace: Path):
@@ -107,15 +113,19 @@ Always be helpful, accurate, and concise. When using tools, explain what you're 
 When remembering something, write to {workspace_path}/memory/MEMORY.md"""
     
     def _load_bootstrap_files(self) -> str:
-        """Load all bootstrap files from workspace."""
+        """Load all bootstrap files from workspace, with size limits."""
         parts = []
-        
+
         for filename in self.BOOTSTRAP_FILES:
             file_path = self.workspace / filename
             if file_path.exists():
+                # Check file size before reading
+                if file_path.stat().st_size > MAX_BOOTSTRAP_FILE_SIZE:
+                    parts.append(f"## {filename}\n\n(skipped: file exceeds {MAX_BOOTSTRAP_FILE_SIZE} bytes)")
+                    continue
                 content = file_path.read_text(encoding="utf-8")
                 parts.append(f"## {filename}\n\n{content}")
-        
+
         return "\n\n".join(parts) if parts else ""
     
     def build_messages(
@@ -159,19 +169,25 @@ When remembering something, write to {workspace_path}/memory/MEMORY.md"""
         return messages
 
     def _build_user_content(self, text: str, media: list[str] | None) -> str | list[dict[str, Any]]:
-        """Build user message content with optional base64-encoded images."""
+        """Build user message content with optional base64-encoded images, with size/count limits."""
         if not media:
             return text
-        
+
         images = []
         for path in media:
+            # Enforce max images per message
+            if len(images) >= MAX_IMAGES_PER_MESSAGE:
+                break
             p = Path(path)
             mime, _ = mimetypes.guess_type(path)
             if not p.is_file() or not mime or not mime.startswith("image/"):
                 continue
+            # Check image file size before reading
+            if p.stat().st_size > MAX_IMAGE_SIZE:
+                continue
             b64 = base64.b64encode(p.read_bytes()).decode()
             images.append({"type": "image_url", "image_url": {"url": f"data:{mime};base64,{b64}"}})
-        
+
         if not images:
             return text
         return images + [{"type": "text", "text": text}]

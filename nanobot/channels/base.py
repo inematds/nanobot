@@ -7,6 +7,10 @@ from loguru import logger
 
 from nanobot.bus.events import InboundMessage, OutboundMessage
 from nanobot.bus.queue import MessageBus
+from nanobot.security.ratelimit import RateLimiter
+
+# Maximum message size (50KB)
+MAX_MESSAGE_SIZE = 50 * 1024
 
 
 class BaseChannel(ABC):
@@ -30,6 +34,7 @@ class BaseChannel(ABC):
         self.config = config
         self.bus = bus
         self._running = False
+        self._rate_limiter = RateLimiter()
     
     @abstractmethod
     async def start(self) -> None:
@@ -69,10 +74,10 @@ class BaseChannel(ABC):
             True if allowed, False otherwise.
         """
         allow_list = getattr(self.config, "allow_from", [])
-        
-        # If no allow list, allow everyone
+
+        # Fail-secure: if no allow list, deny everyone
         if not allow_list:
-            return True
+            return False
         
         sender_str = str(sender_id)
         if sender_str in allow_list:
@@ -103,6 +108,17 @@ class BaseChannel(ABC):
             media: Optional list of media URLs.
             metadata: Optional channel-specific metadata.
         """
+        # Rate limit check before allowlist
+        session_key = f"{self.name}:{chat_id}"
+        if not self._rate_limiter.check(session_key, "channel_message"):
+            logger.warning(f"Rate limited: {sender_id} on {self.name}")
+            return
+
+        # Message size limit
+        if len(content.encode("utf-8")) > MAX_MESSAGE_SIZE:
+            logger.warning(f"Message too large from {sender_id} on {self.name}: {len(content)} chars")
+            return
+
         if not self.is_allowed(sender_id):
             logger.warning(
                 f"Access denied for sender {sender_id} on channel {self.name}. "

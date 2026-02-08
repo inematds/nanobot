@@ -3,6 +3,7 @@
 import asyncio
 import os
 import re
+import shlex
 from pathlib import Path
 from typing import Any
 
@@ -11,7 +12,7 @@ from nanobot.agent.tools.base import Tool
 
 class ExecTool(Tool):
     """Tool to execute shell commands."""
-    
+
     def __init__(
         self,
         timeout: int = 60,
@@ -32,17 +33,28 @@ class ExecTool(Tool):
             r"\b(shutdown|reboot|poweroff)\b",  # system power
             r":\(\)\s*\{.*\};\s*:",          # fork bomb
         ]
+        # Patterns that indicate shell injection / chaining
+        self._injection_patterns = [
+            r";",              # command separator
+            r"&&",             # AND chaining
+            r"\|\|",           # OR chaining
+            r"\|",             # pipe
+            r"`",              # backtick execution
+            r"\$\(",           # subshell $(...)
+            r"\$\{",           # variable expansion ${...}
+            r"<<",             # heredoc
+        ]
         self.allow_patterns = allow_patterns or []
         self.restrict_to_workspace = restrict_to_workspace
-    
+
     @property
     def name(self) -> str:
         return "exec"
-    
+
     @property
     def description(self) -> str:
         return "Execute a shell command and return its output. Use with caution."
-    
+
     @property
     def parameters(self) -> dict[str, Any]:
         return {
@@ -50,7 +62,8 @@ class ExecTool(Tool):
             "properties": {
                 "command": {
                     "type": "string",
-                    "description": "The shell command to execute"
+                    "description": "The shell command to execute",
+                    "maxLength": 5000,
                 },
                 "working_dir": {
                     "type": "string",
@@ -59,21 +72,26 @@ class ExecTool(Tool):
             },
             "required": ["command"]
         }
-    
+
     async def execute(self, command: str, working_dir: str | None = None, **kwargs: Any) -> str:
         cwd = working_dir or self.working_dir or os.getcwd()
         guard_error = self._guard_command(command, cwd)
         if guard_error:
             return guard_error
-        
+
         try:
-            process = await asyncio.create_subprocess_shell(
-                command,
+            # Use create_subprocess_exec with shlex.split instead of shell=True
+            args = shlex.split(command)
+            if not args:
+                return "Error: Empty command"
+
+            process = await asyncio.create_subprocess_exec(
+                *args,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
                 cwd=cwd,
             )
-            
+
             try:
                 stdout, stderr = await asyncio.wait_for(
                     process.communicate(),
@@ -82,29 +100,29 @@ class ExecTool(Tool):
             except asyncio.TimeoutError:
                 process.kill()
                 return f"Error: Command timed out after {self.timeout} seconds"
-            
+
             output_parts = []
-            
+
             if stdout:
                 output_parts.append(stdout.decode("utf-8", errors="replace"))
-            
+
             if stderr:
                 stderr_text = stderr.decode("utf-8", errors="replace")
                 if stderr_text.strip():
                     output_parts.append(f"STDERR:\n{stderr_text}")
-            
+
             if process.returncode != 0:
                 output_parts.append(f"\nExit code: {process.returncode}")
-            
+
             result = "\n".join(output_parts) if output_parts else "(no output)"
-            
+
             # Truncate very long output
             max_len = 10000
             if len(result) > max_len:
                 result = result[:max_len] + f"\n... (truncated, {len(result) - max_len} more chars)"
-            
+
             return result
-            
+
         except Exception as e:
             return f"Error executing command: {str(e)}"
 
@@ -112,6 +130,11 @@ class ExecTool(Tool):
         """Best-effort safety guard for potentially destructive commands."""
         cmd = command.strip()
         lower = cmd.lower()
+
+        # Check for injection patterns (shell metacharacters)
+        for pattern in self._injection_patterns:
+            if re.search(pattern, cmd):
+                return "Error: Command blocked by safety guard (shell injection pattern detected)"
 
         for pattern in self.deny_patterns:
             if re.search(pattern, lower):
@@ -122,6 +145,8 @@ class ExecTool(Tool):
                 return "Error: Command blocked by safety guard (not in allowlist)"
 
         if self.restrict_to_workspace:
+            from nanobot.security.validators import resolve_path_secure
+
             if "..\\" in cmd or "../" in cmd:
                 return "Error: Command blocked by safety guard (path traversal detected)"
 
@@ -132,10 +157,10 @@ class ExecTool(Tool):
 
             for raw in win_paths + posix_paths:
                 try:
-                    p = Path(raw).resolve()
+                    resolve_path_secure(raw, cwd_path)
+                except PermissionError:
+                    return "Error: Command blocked by safety guard (path outside working dir)"
                 except Exception:
                     continue
-                if cwd_path not in p.parents and p != cwd_path:
-                    return "Error: Command blocked by safety guard (path outside working dir)"
 
         return None

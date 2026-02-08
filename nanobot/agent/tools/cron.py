@@ -44,7 +44,8 @@ class CronTool(Tool):
                 },
                 "every_seconds": {
                     "type": "integer",
-                    "description": "Interval in seconds (for recurring tasks)"
+                    "description": "Interval in seconds (for recurring tasks)",
+                    "minimum": 60,
                 },
                 "cron_expr": {
                     "type": "string",
@@ -80,7 +81,22 @@ class CronTool(Tool):
             return "Error: message is required for add"
         if not self._channel or not self._chat_id:
             return "Error: no session context (channel/chat_id)"
-        
+
+        # Max jobs limit
+        existing = self._cron.list_jobs()
+        if len(existing) >= 50:
+            return "Error: Maximum of 50 scheduled jobs reached. Remove some before adding more."
+
+        # Validate interval minimum
+        if every_seconds is not None and every_seconds < 60:
+            return "Error: Minimum interval is 60 seconds"
+
+        # Validate cron expression format (basic check)
+        if cron_expr:
+            parts = cron_expr.strip().split()
+            if len(parts) < 5 or len(parts) > 6:
+                return "Error: Invalid cron expression. Expected 5-6 fields (min hour day month weekday [year])"
+
         # Build schedule
         if every_seconds:
             schedule = CronSchedule(kind="every", every_ms=every_seconds * 1000)
