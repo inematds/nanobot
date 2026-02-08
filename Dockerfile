@@ -12,6 +12,9 @@ RUN apt-get update && \
     apt-get autoremove -y && \
     rm -rf /var/lib/apt/lists/*
 
+# Create non-root user for security
+RUN useradd -m -s /bin/bash nanobot
+
 WORKDIR /app
 
 # Install Python dependencies first (cached layer)
@@ -30,11 +33,24 @@ WORKDIR /app/bridge
 RUN npm install && npm run build
 WORKDIR /app
 
-# Create config directory
-RUN mkdir -p /root/.nanobot
+# Create config and data directories with correct ownership
+RUN mkdir -p /home/nanobot/.nanobot/workspace/memory \
+             /home/nanobot/.nanobot/workspace/skills \
+             /home/nanobot/.nanobot/sessions \
+             /home/nanobot/.nanobot/cron \
+             /home/nanobot/.nanobot/history && \
+    chown -R nanobot:nanobot /home/nanobot/.nanobot && \
+    chmod 700 /home/nanobot/.nanobot
+
+# Switch to non-root user
+USER nanobot
 
 # Gateway default port
 EXPOSE 18790
 
+# Health check
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD nanobot status || exit 1
+
 ENTRYPOINT ["nanobot"]
-CMD ["status"]
+CMD ["gateway"]

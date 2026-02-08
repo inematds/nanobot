@@ -1,0 +1,33 @@
+services:
+  nanobot:
+    build: .
+    container_name: nanobot
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:18790:18790"
+    volumes:
+      # Persiste config, sessoes, workspace, cron entre restarts
+      - nanobot-data:/home/nanobot/.nanobot
+    environment:
+      # Opcional: passar API keys via env em vez de config.json
+      # - NANOBOT_PROVIDERS__OPENROUTER__API_KEY=sk-or-xxx
+      # - NANOBOT_PROVIDERS__ANTHROPIC__API_KEY=sk-ant-xxx
+      - TZ=America/Sao_Paulo
+    # Limites de recursos (protecao extra)
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: "2.0"
+        reservations:
+          memory: 512M
+    # Seguranca: sem privilegios extras
+    security_opt:
+      - no-new-privileges:true
+    read_only: false
+    tmpfs:
+      - /tmp:size=100M
+
+volumes:
+  nanobot-data:
+    driver: local

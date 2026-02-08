@@ -11,3 +11,11 @@ build/
 node_modules/
 bridge/dist/
 workspace/
+tests/
+.pytest_cache/
+.ruff_cache/
+*.md
+!README.md
+!LICENSE
+ANALISE_*.md
+COMPARACAO_*.md
