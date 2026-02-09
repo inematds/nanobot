@@ -127,11 +127,23 @@ docker compose exec nanobot nanobot onboard
 
 ### Passo 2: Configurar a API Key
 
-O arquivo de configuração fica em `~/.nanobot/config.json`. Veja o modelo completo em [`config.example.json`](./config.example.json).
+> [!CAUTION]
+> **Cuidado com os diretórios!** O nanobot usa **dois diretórios diferentes**:
+>
+> | Diretório | O que é | Exemplo |
+> |-----------|---------|---------|
+> | `~/nanobot/` | **Código fonte** (repositório git) | `~/nanobot/nanobot/`, `~/nanobot/README.md` |
+> | `~/.nanobot/` | **Dados e configuração** (pasta oculta) | `~/.nanobot/config.json`, `~/.nanobot/workspace/` |
+>
+> O arquivo de configuração fica em **`~/.nanobot/config.json`** (com ponto!).
+> Se você editar `~/nanobot/config.json` (sem ponto), o nanobot **não vai encontrar**.
 
 ```bash
+# Criar o diretório de dados (se não existir)
+mkdir -p ~/.nanobot
+
 # Copiar o exemplo como ponto de partida
-cp config.example.json ~/.nanobot/config.json
+cp ~/nanobot/config.example.json ~/.nanobot/config.json
 
 # Editar e colocar sua API key
 nano ~/.nanobot/config.json
@@ -145,7 +157,7 @@ nano ~/.nanobot/config.json
 > - [DeepSeek](https://platform.deepseek.com) — DeepSeek direto
 > - [Brave Search](https://brave.com/search/api/) — busca web (opcional)
 
-**Exemplo com OpenRouter** (recomendado):
+**Exemplo mínimo com OpenRouter** (recomendado):
 ```json
 {
   "providers": {
@@ -161,7 +173,7 @@ nano ~/.nanobot/config.json
 }
 ```
 
-**Exemplo com Anthropic direto:**
+**Exemplo mínimo com Anthropic direto:**
 ```json
 {
   "providers": {
@@ -192,6 +204,12 @@ nano ~/.nanobot/config.json
 > [!IMPORTANT]
 > Depois de salvar, proteja o arquivo: `chmod 600 ~/.nanobot/config.json`
 
+**Verificar se o config foi carregado corretamente:**
+```bash
+nanobot status
+```
+Todos os providers com API key devem aparecer com **✓**. Se aparecer "not set", verifique se editou o arquivo correto (`~/.nanobot/config.json`).
+
 ### Passo 3: Testar
 
 ```bash
@@ -218,6 +236,74 @@ nanobot security-check
 ```
 
 That's it! You have a working AI assistant.
+
+## ❓ Troubleshooting
+
+<details>
+<summary><b>"Error: No API key configured"</b></summary>
+
+**Causa mais comum:** config no diretório errado.
+
+```bash
+# Verificar se o config está no lugar certo
+cat ~/.nanobot/config.json
+
+# Se mostrar keys vazias ou arquivo não encontrado:
+cp ~/nanobot/config.example.json ~/.nanobot/config.json
+nano ~/.nanobot/config.json   # Adicionar sua API key
+```
+
+Lembre: `~/.nanobot/` (com ponto) ≠ `~/nanobot/` (sem ponto).
+
+</details>
+
+<details>
+<summary><b>"pip: command not found" ou erro ao instalar</b></summary>
+
+Use ambiente virtual (venv) em vez de pip global:
+
+```bash
+apt update && apt install -y python3 python3-venv
+python3 -m venv venv
+source venv/bin/activate
+pip install -e .
+```
+
+</details>
+
+<details>
+<summary><b>nanobot status mostra providers "not set" mesmo com key configurada</b></summary>
+
+1. Verifique se editou `~/.nanobot/config.json` (com ponto)
+2. Verifique se o JSON é válido: `python3 -c "import json; json.load(open('/root/.nanobot/config.json')); print('OK')"`
+3. Verifique se a key está no campo correto (ex: `providers.openrouter.apiKey`)
+4. Rode `python3 diagnose.py` na pasta do projeto para diagnóstico detalhado
+
+</details>
+
+<details>
+<summary><b>Modelo não encontrado / erro de modelo</b></summary>
+
+Cada provider usa nomes diferentes. Verifique o nome exato na página do provider:
+
+- **OpenRouter:** vá em [openrouter.ai/models](https://openrouter.ai/models), copie o ID do modelo (ex: `anthropic/claude-sonnet-4.5`)
+- **Anthropic direto:** use o ID oficial (ex: `anthropic/claude-sonnet-4-5-20250929`)
+- **OpenAI:** use o ID oficial (ex: `openai/gpt-4o`)
+
+</details>
+
+<details>
+<summary><b>Git clone dá "Permission denied"</b></summary>
+
+O repositório é público. Use HTTPS (não SSH):
+
+```bash
+git clone https://github.com/inematds/nanobot.git
+```
+
+SSH só funciona se você tiver uma chave SSH configurada no GitHub.
+
+</details>
 
 ## 🖥️ Local Models (vLLM)
 
@@ -270,32 +356,54 @@ Talk to your nanobot through Telegram, Discord, WhatsApp, or Feishu — anytime,
 <details>
 <summary><b>Telegram</b> (Recommended)</summary>
 
-**1. Create a bot**
-- Open Telegram, search `@BotFather`
-- Send `/newbot`, follow prompts
-- Copy the token
+**1. Criar o bot**
+- Abra o Telegram e busque `@BotFather`
+- Envie `/newbot` e siga as instruções (escolha nome e username)
+- O BotFather vai te dar um **token** como: `123456789:ABCdefGHIjklMNOpqrsTUVwxyz`
+- Copie esse token
 
-**2. Configure**
+**2. Descobrir seu User ID**
+- Busque `@userinfobot` no Telegram
+- Envie qualquer mensagem para ele
+- Ele responde com seu **ID numérico** (ex: `987654321`)
+
+**3. Configurar**
+
+Edite `~/.nanobot/config.json` e adicione/atualize a seção `channels`:
 
 ```json
 {
+  "providers": {
+    "openrouter": {
+      "apiKey": "sk-or-v1-SUA_KEY"
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": "anthropic/claude-sonnet-4.5"
+    }
+  },
   "channels": {
     "telegram": {
       "enabled": true,
-      "token": "YOUR_BOT_TOKEN",
-      "allowFrom": ["YOUR_USER_ID"]
+      "token": "123456789:ABCdefGHIjklMNOpqrsTUVwxyz",
+      "allowFrom": ["987654321"]
     }
   }
 }
 ```
 
-> Get your user ID from `@userinfobot` on Telegram.
+> [!WARNING]
+> O `allowFrom` é **obrigatório** por segurança. Se deixar vazio `[]`, **ninguém** consegue usar o bot.
+> Coloque seu User ID numérico como string entre aspas.
 
-**3. Run**
+**4. Rodar**
 
 ```bash
 nanobot gateway
 ```
+
+O bot vai ficar online no Telegram. Envie uma mensagem para ele para testar.
 
 </details>
 
@@ -346,37 +454,73 @@ nanobot gateway
 <details>
 <summary><b>WhatsApp</b></summary>
 
-Requires **Node.js ≥18**.
+Requer **Node.js ≥18** instalado no servidor.
 
-**1. Link device**
+**1. Instalar Node.js (se não tiver)**
+
+```bash
+curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+apt install -y nodejs
+```
+
+**2. Compilar a bridge do WhatsApp**
+
+```bash
+cd ~/nanobot/bridge
+npm install && npm run build
+cd ~/nanobot
+```
+
+**3. Vincular dispositivo**
 
 ```bash
 nanobot channels login
-# Scan QR with WhatsApp → Settings → Linked Devices
 ```
 
-**2. Configure**
+Um QR code vai aparecer no terminal. No celular:
+- Abra o WhatsApp → **Configurações** → **Dispositivos vinculados** → **Vincular dispositivo**
+- Escaneie o QR code
+
+**4. Configurar**
+
+Edite `~/.nanobot/config.json` e adicione a seção WhatsApp:
 
 ```json
 {
+  "providers": {
+    "openrouter": {
+      "apiKey": "sk-or-v1-SUA_KEY"
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": "anthropic/claude-sonnet-4.5"
+    }
+  },
   "channels": {
     "whatsapp": {
       "enabled": true,
-      "allowFrom": ["+1234567890"]
+      "allowFrom": ["+5511999998888"]
     }
   }
 }
 ```
 
-**3. Run** (two terminals)
+> [!WARNING]
+> O `allowFrom` usa o número no formato internacional com `+` (ex: `+5511999998888`).
+> Se deixar vazio `[]`, **ninguém** consegue usar o bot.
+
+**5. Rodar** (dois terminais)
 
 ```bash
-# Terminal 1
+# Terminal 1 — manter a bridge rodando
 nanobot channels login
 
-# Terminal 2
+# Terminal 2 — rodar o gateway
 nanobot gateway
 ```
+
+Envie uma mensagem para o número vinculado para testar.
 
 </details>
 
