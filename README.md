@@ -346,6 +346,10 @@ nanobot agent -m "Hello from my local LLM!"
 
 Talk to your nanobot through Telegram, Discord, WhatsApp, or Feishu — anytime, anywhere.
 
+<p align="center">
+  <img src="nanobot_telegram_example.png" alt="nanobot chat integrations" width="600">
+</p>
+
 | Channel | Setup |
 |---------|-------|
 | **Telegram** | Easy (just a token) |
