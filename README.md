@@ -127,9 +127,13 @@ docker compose exec nanobot nanobot onboard
 
 ### Passo 2: Configurar a API Key
 
-O arquivo de configuração fica em `~/.nanobot/config.json`. Edite com:
+O arquivo de configuração fica em `~/.nanobot/config.json`. Veja o modelo completo em [`config.example.json`](./config.example.json).
 
 ```bash
+# Copiar o exemplo como ponto de partida
+cp config.example.json ~/.nanobot/config.json
+
+# Editar e colocar sua API key
 nano ~/.nanobot/config.json
 ```
 
