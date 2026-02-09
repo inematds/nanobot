@@ -155,7 +155,7 @@ nano ~/.nanobot/config.json
   },
   "agents": {
     "defaults": {
-      "model": "anthropic/claude-sonnet-4-5-20250929"
+      "model": "anthropic/claude-sonnet-4.5"
     }
   }
 }
@@ -178,13 +178,16 @@ nano ~/.nanobot/config.json
 ```
 
 > [!WARNING]
-> Use o nome exato do modelo. Exemplos válidos:
-> - `anthropic/claude-sonnet-4-5-20250929` (Sonnet)
-> - `anthropic/claude-opus-4-5` (Opus)
-> - `openai/gpt-4o` (GPT-4o)
-> - `deepseek/deepseek-chat` (DeepSeek)
+> **O nome do modelo depende do provider!** Cada provider usa seu próprio formato:
 >
-> Nomes como `claude-sonnet-4.5` ou `claude-4-sonnet` **NÃO funcionam**.
+> | Provider | Formato do modelo | Exemplo |
+> |----------|-------------------|---------|
+> | OpenRouter | Slug do OpenRouter | `anthropic/claude-sonnet-4.5` |
+> | Anthropic direto | ID oficial Anthropic | `anthropic/claude-sonnet-4-5-20250929` |
+> | OpenAI | ID oficial OpenAI | `openai/gpt-4o` |
+> | DeepSeek | ID DeepSeek | `deepseek/deepseek-chat` |
+>
+> Consulte a página do modelo no seu provider para o nome exato.
 
 > [!IMPORTANT]
 > Depois de salvar, proteja o arquivo: `chmod 600 ~/.nanobot/config.json`
