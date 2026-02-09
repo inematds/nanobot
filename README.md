@@ -69,46 +69,84 @@
 
 ## 📦 Install
 
-**Install from source** (latest features, recommended for development)
+Escolha entre **VPS direto** ou **Docker**. Ambos usam o mesmo repositório.
+
+### Opção A: VPS Direto
 
 ```bash
-git clone https://github.com/HKUDS/nanobot.git
+# 1. Atualizar sistema e instalar dependências
+apt update && apt install -y python3 python3-venv git
+
+# 2. Clonar o repositório
+git clone https://github.com/inematds/nanobot.git
 cd nanobot
+
+# 3. Criar ambiente virtual e instalar
+python3 -m venv venv
+source venv/bin/activate
 pip install -e .
 ```
 
-**Install with [uv](https://github.com/astral-sh/uv)** (stable, fast)
+> [!TIP]
+> Sempre ative o venv antes de usar: `source ~/nanobot/venv/bin/activate`
+
+### Opção B: Docker
 
 ```bash
-uv tool install nanobot-ai
+# 1. Clonar o repositório
+git clone https://github.com/inematds/nanobot.git
+cd nanobot
+
+# 2. Subir com docker compose
+docker compose up -d
 ```
 
-**Install from PyPI** (stable)
+Pronto. O container roda em background com volume persistente.
+
+### Outras formas de instalar
 
 ```bash
+# Via uv (rápido)
+uv tool install nanobot-ai
+
+# Via PyPI
 pip install nanobot-ai
 ```
 
 ## 🚀 Quick Start
 
-> [!TIP]
-> Set your API key in `~/.nanobot/config.json`.
-> Get API keys: [OpenRouter](https://openrouter.ai/keys) (Global) · [DashScope](https://dashscope.console.aliyun.com) (Qwen) · [Brave Search](https://brave.com/search/api/) (optional, for web search)
-
-**1. Initialize**
+### Passo 1: Inicializar
 
 ```bash
+# VPS direto
 nanobot onboard
+
+# Docker
+docker compose exec nanobot nanobot onboard
 ```
 
-**2. Configure** (`~/.nanobot/config.json`)
+### Passo 2: Configurar a API Key
 
-For OpenRouter - recommended for global users:
+O arquivo de configuração fica em `~/.nanobot/config.json`. Edite com:
+
+```bash
+nano ~/.nanobot/config.json
+```
+
+> [!TIP]
+> **Onde conseguir API keys:**
+> - [OpenRouter](https://openrouter.ai/keys) — acesso a todos os modelos (recomendado)
+> - [Anthropic](https://console.anthropic.com) — Claude direto
+> - [OpenAI](https://platform.openai.com) — GPT direto
+> - [DeepSeek](https://platform.deepseek.com) — DeepSeek direto
+> - [Brave Search](https://brave.com/search/api/) — busca web (opcional)
+
+**Exemplo com OpenRouter** (recomendado):
 ```json
 {
   "providers": {
     "openrouter": {
-      "apiKey": "sk-or-v1-xxx"
+      "apiKey": "sk-or-v1-COLE_SUA_CHAVE_AQUI"
     }
   },
   "agents": {
@@ -119,13 +157,51 @@ For OpenRouter - recommended for global users:
 }
 ```
 
-**3. Chat**
+**Exemplo com Anthropic direto:**
+```json
+{
+  "providers": {
+    "anthropic": {
+      "apiKey": "sk-ant-COLE_SUA_CHAVE_AQUI"
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": "anthropic/claude-sonnet-4-5-20250929"
+    }
+  }
+}
+```
+
+> [!IMPORTANT]
+> Depois de salvar, proteja o arquivo: `chmod 600 ~/.nanobot/config.json`
+
+### Passo 3: Testar
 
 ```bash
 nanobot agent -m "What is 2+2?"
 ```
 
-That's it! You have a working AI assistant in 2 minutes.
+### Passo 4: Rodar o Gateway (modo servidor)
+
+```bash
+# VPS direto (roda em foreground)
+nanobot gateway
+
+# VPS direto (roda em background)
+nohup nanobot gateway > /tmp/nanobot.log 2>&1 &
+
+# Docker (já está rodando se usou docker compose up -d)
+docker compose logs -f nanobot
+```
+
+### Passo 5: Verificar segurança
+
+```bash
+nanobot security-check
+```
+
+That's it! You have a working AI assistant.
 
 ## 🖥️ Local Models (vLLM)
 
@@ -442,13 +518,19 @@ That's it! Environment variables, model prefixing, config matching, and `nanobot
 
 ### Security
 
-> [!TIP]
-> For production deployments, set `"restrictToWorkspace": true` in your config to sandbox the agent.
+> [!IMPORTANT]
+> **Breaking changes:** `restrictToWorkspace` agora é `true` por padrão, `allowFrom` vazio agora **nega todos**, e o gateway escuta em `127.0.0.1`. Veja [SECURITY.md](./SECURITY.md) para detalhes.
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| `tools.restrictToWorkspace` | `false` | When `true`, restricts **all** agent tools (shell, file read/write/edit, list) to the workspace directory. Prevents path traversal and out-of-scope access. |
-| `channels.*.allowFrom` | `[]` (allow all) | Whitelist of user IDs. Empty = allow everyone; non-empty = only listed users can interact. |
+| `tools.restrictToWorkspace` | `true` | Restringe todos os tools ao diretório workspace. Previne path traversal. |
+| `channels.*.allowFrom` | `[]` (deny all) | Lista de IDs permitidos. Vazio = nega todos (fail-secure). Adicione IDs para liberar. |
+| `gateway.host` | `127.0.0.1` | Endereço de bind. Use reverse proxy para acesso remoto. |
+
+```bash
+# Verificar configuração de segurança
+nanobot security-check
+```
 
 
 ## CLI Reference
@@ -462,6 +544,7 @@ That's it! Environment variables, model prefixing, config matching, and `nanobot
 | `nanobot status` | Show status |
 | `nanobot channels login` | Link WhatsApp (scan QR) |
 | `nanobot channels status` | Show channel status |
+| `nanobot security-check` | Verify security configuration |
 
 <details>
 <summary><b>Scheduled Tasks (Cron)</b></summary>
@@ -482,27 +565,41 @@ nanobot cron remove <job_id>
 
 ## 🐳 Docker
 
-> [!TIP]
-> The `-v ~/.nanobot:/root/.nanobot` flag mounts your local config directory into the container, so your config and workspace persist across container restarts.
-
-Build and run nanobot in a container:
+O `docker-compose.yml` inclui volume persistente, limites de recursos, e roda como usuário non-root.
 
 ```bash
-# Build the image
+# Subir (build + run em background)
+docker compose up -d
+
+# Ver logs
+docker compose logs -f
+
+# Inicializar config (primeira vez)
+docker compose exec nanobot nanobot onboard
+
+# Editar config no host para adicionar API key
+# O volume fica em: docker volume inspect nanobot_nanobot-data
+# Ou copie o config para dentro:
+docker compose cp ~/.nanobot/config.json nanobot:/home/nanobot/.nanobot/config.json
+
+# Reiniciar após alterar config
+docker compose restart
+
+# Testar um comando
+docker compose exec nanobot nanobot agent -m "Hello!"
+
+# Verificar status
+docker compose exec nanobot nanobot status
+
+# Parar
+docker compose down
+```
+
+**Sem docker compose** (manual):
+
+```bash
 docker build -t nanobot .
-
-# Initialize config (first time only)
-docker run -v ~/.nanobot:/root/.nanobot --rm nanobot onboard
-
-# Edit config on host to add API keys
-vim ~/.nanobot/config.json
-
-# Run gateway (connects to Telegram/WhatsApp)
-docker run -v ~/.nanobot:/root/.nanobot -p 18790:18790 nanobot gateway
-
-# Or run a single command
-docker run -v ~/.nanobot:/root/.nanobot --rm nanobot agent -m "Hello!"
-docker run -v ~/.nanobot:/root/.nanobot --rm nanobot status
+docker run -v ~/.nanobot:/home/nanobot/.nanobot -p 127.0.0.1:18790:18790 --restart unless-stopped -d nanobot gateway
 ```
 
 ## 📁 Project Structure
