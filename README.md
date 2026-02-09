@@ -155,7 +155,7 @@ nano ~/.nanobot/config.json
   },
   "agents": {
     "defaults": {
-      "model": "anthropic/claude-opus-4-5"
+      "model": "anthropic/claude-sonnet-4-5-20250929"
     }
   }
 }
@@ -176,6 +176,15 @@ nano ~/.nanobot/config.json
   }
 }
 ```
+
+> [!WARNING]
+> Use o nome exato do modelo. Exemplos válidos:
+> - `anthropic/claude-sonnet-4-5-20250929` (Sonnet)
+> - `anthropic/claude-opus-4-5` (Opus)
+> - `openai/gpt-4o` (GPT-4o)
+> - `deepseek/deepseek-chat` (DeepSeek)
+>
+> Nomes como `claude-sonnet-4.5` ou `claude-4-sonnet` **NÃO funcionam**.
 
 > [!IMPORTANT]
 > Depois de salvar, proteja o arquivo: `chmod 600 ~/.nanobot/config.json`
