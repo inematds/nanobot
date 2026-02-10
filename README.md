@@ -4,13 +4,15 @@
   <p>
     <img src="https://img.shields.io/badge/python-≥3.11-blue" alt="Python">
     <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
-    <a href="https://inematds.github.io/nanobot/"><img src="https://img.shields.io/badge/Docs-GitHub%20Pages-00d4ff?style=flat&logo=github" alt="Docs"></a>
+    <a href="https://inematds.github.io/nanobot/"><img src="https://img.shields.io/badge/📖_Documentação_Completa-GitHub_Pages-00d4ff?style=for-the-badge&logo=github" alt="Docs"></a>
   </p>
 </div>
 
 🐈 **nanobot** is an **ultra-lightweight** personal AI assistant — fork from the [original project (HKUDS/nanobot)](https://github.com/HKUDS/nanobot)
 
 ⚡️ Delivers core agent functionality in just **~4,000** lines of code.
+
+> **📖 [Documentação completa no GitHub Pages](https://inematds.github.io/nanobot/)** — Arquitetura, Guia de Instalação, Docker e Referência Técnica
 
 ## Key Features of nanobot:
 

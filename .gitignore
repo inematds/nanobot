@@ -5,6 +5,7 @@ dist/
 build/
 docs/
 !docs/index.html
+!docs/tecnico.html
 *.egg-info/
 *.egg
 *.pyc
