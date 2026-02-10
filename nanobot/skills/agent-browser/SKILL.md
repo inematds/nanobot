@@ -1,7 +1,7 @@
 ---
 name: agent-browser
 description: "Browser automation CLI for AI agents. Use when the user needs to navigate websites, fill forms, click buttons, take screenshots, extract data, test web apps, or automate any browser task."
-metadata: {"nanobot":{"emoji":"🌐","requires":{"bins":["agent-browser"]},"install":[{"id":"npm","kind":"npm","package":"@anthropic-ai/agent-browser","bins":["agent-browser"],"label":"Install agent-browser (npm)"}]}}
+metadata: {"nanobot":{"emoji":"🌐","requires":{"bins":["agent-browser"]},"install":[{"id":"npm","kind":"npm","package":"agent-browser","bins":["agent-browser"],"label":"Install agent-browser (npm install -g agent-browser && agent-browser install)"}]}}
 ---
 
 # Browser Automation with agent-browser
@@ -159,7 +159,8 @@ agent-browser find testid "submit-btn" click
 ## Installation
 
 ```bash
-npm install -g @anthropic-ai/agent-browser
+npm install -g agent-browser
+agent-browser install
 ```
 
-Requires Node.js >= 18. Uses Chromium by default (via Playwright).
+Requires Node.js >= 18. The `agent-browser install` command downloads Chromium.
