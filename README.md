@@ -132,16 +132,51 @@ apt install -y python3 python3-venv git && cd /root && git clone https://github.
 
 ### Opção B: Docker
 
+Com Docker, **você não precisa de venv, pip, nem ativar ambiente**. O container faz tudo isolado.
+
 ```bash
 # 1. Clonar o repositório
 git clone https://github.com/inematds/nanobot.git
 cd nanobot
 
-# 2. Subir com docker compose
+# 2. Construir e subir (leva 2-3 minutos na primeira vez)
 docker compose up -d
 ```
 
-Pronto. O container roda em background com volume persistente.
+O que acontece por dentro:
+
+| Etapa | O que o Docker faz sozinho |
+|-------|---------------------------|
+| Baixa Python 3.12 | Imagem base já vem com Python |
+| Instala Node.js 20 | Para a bridge do WhatsApp |
+| Instala dependências | `uv pip install .` (todas as ~50 bibliotecas) |
+| Compila bridge | `npm install && npm run build` |
+| Cria estrutura | Diretórios de config, workspace, sessions |
+| Inicia o gateway | Roda `nanobot gateway` automaticamente |
+
+> [!TIP]
+> **Vantagem do Docker:** o container reinicia sozinho se o servidor reiniciar
+> (`restart: unless-stopped`). Não precisa de systemd nem de venv.
+
+> [!NOTE]
+> Depois de construir a imagem, **pode apagar o diretório clonado** se quiser.
+> O código fica dentro da imagem Docker e os dados ficam no volume `nanobot-data`.
+> Porém, se manter o diretório, fica mais fácil atualizar com `git pull && docker compose up -d --build`.
+
+**Comandos do dia a dia com Docker:**
+
+| O que quer fazer | Comando |
+|------------------|---------|
+| Iniciar | `docker compose up -d` |
+| Parar | `docker compose down` |
+| Reiniciar | `docker compose restart` |
+| Ver logs ao vivo | `docker compose logs -f` |
+| Ver status | `docker compose exec nanobot nanobot status` |
+| Entrar no container | `docker compose exec nanobot bash` |
+| Mandar mensagem | `docker compose exec nanobot nanobot agent -m "Olá"` |
+| Atualizar código | `git pull && docker compose up -d --build` |
+
+> Guia completo com Docker: [`doc/GUIA_DOCKER.md`](doc/GUIA_DOCKER.md)
 
 ### Outras formas de instalar
 
@@ -855,35 +890,58 @@ nanobot cron remove <job_id>
 
 ## 🐳 Docker
 
-O `docker-compose.yml` inclui volume persistente, limites de recursos, e roda como usuário non-root.
+O `docker-compose.yml` inclui volume persistente, limites de recursos (2GB RAM, 2 CPUs),
+e roda como usuário non-root. Guia completo: [`doc/GUIA_DOCKER.md`](doc/GUIA_DOCKER.md)
+
+**Setup inicial:**
 
 ```bash
-# Subir (build + run em background)
+# 1. Subir (build + run em background)
 docker compose up -d
 
-# Ver logs
-docker compose logs -f
-
-# Inicializar config (primeira vez)
+# 2. Inicializar config (primeira vez)
 docker compose exec nanobot nanobot onboard
 
-# Editar config no host para adicionar API key
-# O volume fica em: docker volume inspect nanobot_nanobot-data
-# Ou copie o config para dentro:
-docker compose cp ~/.nanobot/config.json nanobot:/home/nanobot/.nanobot/config.json
+# 3. Colocar sua configuração
+cat > /tmp/nanobot-config.json << 'EOF'
+{
+  "providers": {
+    "openrouter": { "apiKey": "sk-or-v1-SUA_CHAVE" }
+  },
+  "agents": {
+    "defaults": { "model": "qwen/qwen3-coder-next" }
+  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "token": "SEU_TOKEN_DO_BOTFATHER",
+      "allowFrom": ["SEU_ID_NUMERICO"]
+    }
+  }
+}
+EOF
+docker compose cp /tmp/nanobot-config.json nanobot:/home/nanobot/.nanobot/config.json
 
-# Reiniciar após alterar config
+# 4. Reiniciar pra pegar a nova config
 docker compose restart
-
-# Testar um comando
-docker compose exec nanobot nanobot agent -m "Hello!"
-
-# Verificar status
-docker compose exec nanobot nanobot status
-
-# Parar
-docker compose down
 ```
+
+**Uso no dia a dia:**
+
+| O que quer fazer | Comando |
+|------------------|---------|
+| Iniciar | `docker compose up -d` |
+| Parar | `docker compose down` |
+| Reiniciar | `docker compose restart` |
+| Ver logs ao vivo | `docker compose logs -f` |
+| Ver status | `docker compose exec nanobot nanobot status` |
+| Entrar no container | `docker compose exec nanobot bash` |
+| Atualizar código | `git pull && docker compose up -d --build` |
+
+> [!NOTE]
+> Depois de construir, pode apagar o diretório clonado se quiser.
+> O código fica na imagem Docker e os dados no volume `nanobot-data`.
+> Mas mantendo o diretório, fica mais fácil atualizar.
 
 **Sem docker compose** (manual):
 
@@ -891,6 +949,16 @@ docker compose down
 docker build -t nanobot .
 docker run -v ~/.nanobot:/home/nanobot/.nanobot -p 127.0.0.1:18790:18790 --restart unless-stopped -d nanobot gateway
 ```
+
+**Docker vs VPS direto:**
+
+| | VPS Direto | Docker |
+|--|-----------|--------|
+| Precisa de venv? | Sim | Não |
+| Precisa ativar ambiente? | Sim (`source`) | Não |
+| Reinicia sozinho? | Não (sem systemd) | Sim |
+| Limites de recurso | Sem limite | 2GB RAM, 2 CPUs |
+| Segurança | Root direto | Usuário sem privilégios |
 
 ## 📁 Project Structure
 
