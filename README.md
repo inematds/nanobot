@@ -2,31 +2,28 @@
   <img src="nanobot_logo.png" alt="nanobot" width="500">
   <h1>nanobot: Ultra-Lightweight Personal AI Assistant</h1>
   <p>
-    <a href="https://pypi.org/project/nanobot-ai/"><img src="https://img.shields.io/pypi/v/nanobot-ai" alt="PyPI"></a>
-    <a href="https://pepy.tech/project/nanobot-ai"><img src="https://static.pepy.tech/badge/nanobot-ai" alt="Downloads"></a>
     <img src="https://img.shields.io/badge/python-≥3.11-blue" alt="Python">
     <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
-    <a href="./COMMUNICATION.md"><img src="https://img.shields.io/badge/Feishu-Group-E9DBFC?style=flat&logo=feishu&logoColor=white" alt="Feishu"></a>
-    <a href="./COMMUNICATION.md"><img src="https://img.shields.io/badge/WeChat-Group-C5EAB4?style=flat&logo=wechat&logoColor=white" alt="WeChat"></a>
-    <a href="https://discord.gg/MnCvHqpUGB"><img src="https://img.shields.io/badge/Discord-Community-5865F2?style=flat&logo=discord&logoColor=white" alt="Discord"></a>
+    <a href="https://inematds.github.io/nanobot/"><img src="https://img.shields.io/badge/Docs-GitHub%20Pages-00d4ff?style=flat&logo=github" alt="Docs"></a>
   </p>
 </div>
 
-🐈 **nanobot** is an **ultra-lightweight** personal AI assistant inspired by [Clawdbot](https://github.com/openclaw/openclaw) 
+🐈 **nanobot** is an **ultra-lightweight** personal AI assistant — fork from the [original project (HKUDS/nanobot)](https://github.com/HKUDS/nanobot)
 
-⚡️ Delivers core agent functionality in just **~4,000** lines of code — **99% smaller** than Clawdbot's 430k+ lines.
+⚡️ Delivers core agent functionality in just **~4,000** lines of code.
 
-📏 Real-time line count: **3,437 lines** (run `bash core_agent_lines.sh` to verify anytime)
+## 🆕 O que este fork inclui
 
-## 📢 News
+Adições e melhorias feitas neste repositório sobre o projeto original:
 
-- **2026-02-08** 🔧 Refactored Providers—adding a new LLM provider now takes just 2 simple steps! Check [here](#providers).
-- **2026-02-07** 🚀 Released v0.1.3.post5 with Qwen support & several key improvements! Check [here](https://github.com/HKUDS/nanobot/releases/tag/v0.1.3.post5) for details.
-- **2026-02-06** ✨ Added Moonshot/Kimi provider, Discord integration, and enhanced security hardening!
-- **2026-02-05** ✨ Added Feishu channel, DeepSeek provider, and enhanced scheduled tasks support!
-- **2026-02-04** 🚀 Released v0.1.3.post4 with multi-provider & Docker support! Check [here](https://github.com/HKUDS/nanobot/releases/tag/v0.1.3.post4) for details.
-- **2026-02-03** ⚡ Integrated vLLM for local LLM support and improved natural language task scheduling!
-- **2026-02-02** 🎉 nanobot officially launched! Welcome to try 🐈 nanobot!
+- **Documentação completa em PT-BR** — README, guia de instalação para leigos, guia Docker com comparações
+- **GitHub Pages** — site com documentação de [arquitetura](https://inematds.github.io/nanobot/), [instalação](https://inematds.github.io/nanobot/instalacao.html) e [Docker](https://inematds.github.io/nanobot/docker.html)
+- **Skill Remotion completo** — 35 regras de referência + 3 exemplos de código TSX (bar chart, typewriter, word highlight) adaptados do [remotion-dev/remotion](https://github.com/remotion-dev/remotion) e [inematds/remotion-skills](https://github.com/inematds/remotion-skills)
+- **Scripts auxiliares** — `start.sh` (ativa venv), `help.sh` (guia rápido de comandos)
+- **Aliases .bashrc** — `nb` (ativa ambiente), `nbhelp` (guia rápido)
+- **Diagnóstico** — script `diagnose.py` para identificar problemas de configuração
+- **Troubleshooting** — seção completa com soluções para erros comuns
+- **Configurações em PT-BR** — Telegram, OpenRouter, segurança, tudo documentado passo a passo
 
 ## Key Features of nanobot:
 
@@ -1062,43 +1059,9 @@ docker run -v ~/.nanobot:/home/nanobot/.nanobot -p 127.0.0.1:18790:18790 --resta
 > Existem **DOIS** diretórios parecidos. O nanobot lê a configuração de `~/.nanobot/config.json`
 > (com ponto). O arquivo `~/nanobot/config.example.json` (sem ponto) é apenas um exemplo.
 
-## 🤝 Contribute & Roadmap
+## 🔗 Créditos
 
-PRs welcome! The codebase is intentionally small and readable. 🤗
-
-**Roadmap** — Pick an item and [open a PR](https://github.com/HKUDS/nanobot/pulls)!
-
-- [x] **Voice Transcription** — Support for Groq Whisper (Issue #13)
-- [ ] **Multi-modal** — See and hear (images, voice, video)
-- [ ] **Long-term memory** — Never forget important context
-- [ ] **Better reasoning** — Multi-step planning and reflection
-- [ ] **More integrations** — Discord, Slack, email, calendar
-- [ ] **Self-improvement** — Learn from feedback and mistakes
-
-### Contributors
-
-<a href="https://github.com/HKUDS/nanobot/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=HKUDS/nanobot&max=100&columns=12" />
-</a>
-
-
-## ⭐ Star History
-
-<div align="center">
-  <a href="https://star-history.com/#HKUDS/nanobot&Date">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=HKUDS/nanobot&type=Date&theme=dark" />
-      <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=HKUDS/nanobot&type=Date" />
-      <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=HKUDS/nanobot&type=Date" style="border-radius: 15px; box-shadow: 0 0 30px rgba(0, 217, 255, 0.3);" />
-    </picture>
-  </a>
-</div>
-
-<p align="center">
-  <em> Thanks for visiting ✨ nanobot!</em><br><br>
-  <img src="https://visitor-badge.laobi.icu/badge?page_id=HKUDS.nanobot&style=for-the-badge&color=00d4ff" alt="Views">
-</p>
-
+Este projeto é um fork de [HKUDS/nanobot](https://github.com/HKUDS/nanobot), com adições de documentação, skills e ferramentas auxiliares.
 
 <p align="center">
   <sub>nanobot is for educational, research, and technical exchange purposes only</sub>
