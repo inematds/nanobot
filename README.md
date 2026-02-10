@@ -71,24 +71,64 @@
 
 Escolha entre **VPS direto** ou **Docker**. Ambos usam o mesmo repositório.
 
-### Opção A: VPS Direto
+### Opção A: VPS Direto (recomendado)
+
+**1. Atualizar o sistema e instalar ferramentas:**
 
 ```bash
-# 1. Atualizar sistema e instalar dependências
-apt update && apt install -y python3 python3-venv git
+apt update && apt upgrade -y
+apt install -y python3 python3-venv python3-pip git
+```
 
-# 2. Clonar o repositório
+- `python3` — linguagem que o nanobot usa
+- `python3-venv` — permite criar ambientes virtuais (o Ubuntu 24.04 não traz por padrão)
+- `git` — para baixar o código do GitHub
+
+**2. Clonar o repositório:**
+
+```bash
+cd /root
 git clone https://github.com/inematds/nanobot.git
 cd nanobot
+```
 
-# 3. Criar ambiente virtual e instalar
+**3. Criar o ambiente virtual (venv):**
+
+```bash
 python3 -m venv venv
+```
+
+O venv é uma cópia isolada do Python. Ele funciona como uma "caixa" onde as dependências
+do nanobot ficam separadas do sistema. Sem isso, instalar pacotes pode quebrar o Ubuntu.
+
+**4. Ativar o venv:**
+
+```bash
 source venv/bin/activate
+```
+
+O prompt muda para `(venv) root@servidor:~/nanobot#` indicando que está ativo.
+
+> [!IMPORTANT]
+> **O que é o `source`?** Quando você roda um script normal (`./start.sh`), ele abre
+> um terminal temporário, executa lá dentro, e fecha — as mudanças morrem junto.
+> Com `source`, os comandos rodam **no seu terminal atual**, então o venv fica ativo pra você usar.
+> Toda vez que abrir um novo terminal SSH, precisa rodar `source` de novo (ou usar o atalho `nb`).
+
+**5. Instalar o nanobot e dependências:**
+
+```bash
 pip install -e .
 ```
 
-> [!TIP]
-> Sempre ative o venv antes de usar: `source ~/nanobot/venv/bin/activate`
+O `pip` lê o `pyproject.toml` e instala tudo que o nanobot precisa (~50 pacotes) dentro do venv.
+O `-e` significa "editável" — se fizer `git pull` depois, as mudanças valem sem reinstalar.
+
+**Resumo em uma linha:**
+
+```bash
+apt install -y python3 python3-venv git && cd /root && git clone https://github.com/inematds/nanobot.git && cd nanobot && python3 -m venv venv && source venv/bin/activate && pip install -e .
+```
 
 ### Opção B: Docker
 
@@ -118,14 +158,48 @@ pip install nanobot-ai
 ### Passo 1: Inicializar
 
 ```bash
-# VPS direto
+# VPS direto (com venv ativo)
 nanobot onboard
 
 # Docker
 docker compose exec nanobot nanobot onboard
 ```
 
-### Passo 2: Configurar a API Key
+Isso cria a pasta `~/.nanobot/` com a configuração padrão e o workspace do agente.
+
+### Passo 2: Configurar atalhos (opcional, recomendado)
+
+```bash
+echo '' >> ~/.bashrc
+echo '# Nanobot - atalhos' >> ~/.bashrc
+echo 'alias nb="cd /root/nanobot && source venv/bin/activate"' >> ~/.bashrc
+echo 'alias nbhelp="cd /root/nanobot && bash help.sh"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+Isso cria dois atalhos que funcionam toda vez que você entrar via SSH:
+
+| Atalho | O que faz |
+|--------|-----------|
+| `nb` | Ativa o ambiente do nanobot (mesmo que `cd /root/nanobot && source venv/bin/activate`) |
+| `nbhelp` | Mostra um guia rápido com todos os comandos |
+
+> [!TIP]
+> **O que é o `.bashrc`?** É um arquivo que o Linux lê automaticamente toda vez que
+> você abre um terminal ou entra via SSH. É como uma "lista de preparação automática".
+>
+> **O que é um `alias`?** É um apelido para um comando longo. Em vez de digitar
+> `cd /root/nanobot && source venv/bin/activate`, você digita só `nb`.
+> Funciona como o contato do celular — em vez de decorar o número, salva com um nome.
+
+Também existem dois scripts na raiz do projeto:
+
+| Script | Como usar | O que faz |
+|--------|-----------|-----------|
+| `start.sh` | `source start.sh` | Ativa o venv (precisa do `source`) |
+| `help.sh` | `bash help.sh` | Mostra guia rápido com todos os comandos |
+
+### Passo 3: Configurar a API Key
 
 > [!CAUTION]
 > **Cuidado com os diretórios!** O nanobot usa **dois diretórios diferentes**:
@@ -210,32 +284,70 @@ nanobot status
 ```
 Todos os providers com API key devem aparecer com **✓**. Se aparecer "not set", verifique se editou o arquivo correto (`~/.nanobot/config.json`).
 
-### Passo 3: Testar
+### Passo 4: Testar
 
 ```bash
 nanobot agent -m "What is 2+2?"
 ```
 
-### Passo 4: Rodar o Gateway (modo servidor)
+### Passo 5: Rodar o Gateway (modo servidor)
 
 ```bash
-# VPS direto (roda em foreground)
+# VPS direto (roda em foreground, Ctrl+C para parar)
 nanobot gateway
 
-# VPS direto (roda em background)
-nohup nanobot gateway > /tmp/nanobot.log 2>&1 &
+# VPS direto (roda em background, sobrevive ao fechar o terminal)
+nohup python -m nanobot gateway > ~/.nanobot/gateway.log 2>&1 &
 
 # Docker (já está rodando se usou docker compose up -d)
 docker compose logs -f nanobot
 ```
 
-### Passo 5: Verificar segurança
+### Passo 6: Verificar segurança
 
 ```bash
 nanobot security-check
 ```
 
 That's it! You have a working AI assistant.
+
+## 🔧 Uso no Dia a Dia
+
+Toda vez que entrar via SSH, primeiro ative o ambiente:
+
+```bash
+# Opção 1: atalho (se configurou no passo 2)
+nb
+
+# Opção 2: usando o script
+cd /root/nanobot
+source start.sh
+
+# Opção 3: comando completo
+cd /root/nanobot && source venv/bin/activate
+```
+
+### Comandos rápidos
+
+| O que quer fazer          | Comando |
+|---------------------------|---------|
+| Ver configuração          | `nanobot status` |
+| Ver se está rodando       | `ps aux \| grep 'nanobot gateway'` |
+| Iniciar (foreground)      | `nanobot gateway` |
+| Iniciar (background)      | `nohup python -m nanobot gateway > ~/.nanobot/gateway.log 2>&1 &` |
+| Parar                     | `pkill -f 'nanobot gateway'` |
+| Reiniciar                 | `pkill -f 'nanobot gateway' && sleep 2 && nohup python -m nanobot gateway > ~/.nanobot/gateway.log 2>&1 &` |
+| Ver log ao vivo           | `tail -f ~/.nanobot/gateway.log` |
+| Ver guia rápido           | `bash help.sh` |
+
+### Atualizar o código
+
+```bash
+nb
+git pull && pip install -e .
+pkill -f 'nanobot gateway'
+nohup python -m nanobot gateway > ~/.nanobot/gateway.log 2>&1 &
+```
 
 ## ❓ Troubleshooting
 
@@ -769,24 +881,38 @@ docker run -v ~/.nanobot:/home/nanobot/.nanobot -p 127.0.0.1:18790:18790 --resta
 ## 📁 Project Structure
 
 ```
-nanobot/
-├── agent/          # 🧠 Core agent logic
-│   ├── loop.py     #    Agent loop (LLM ↔ tool execution)
-│   ├── context.py  #    Prompt builder
-│   ├── memory.py   #    Persistent memory
-│   ├── skills.py   #    Skills loader
-│   ├── subagent.py #    Background task execution
-│   └── tools/      #    Built-in tools (incl. spawn)
-├── skills/         # 🎯 Bundled skills (github, weather, tmux...)
-├── channels/       # 📱 WhatsApp integration
-├── bus/            # 🚌 Message routing
-├── cron/           # ⏰ Scheduled tasks
-├── heartbeat/      # 💓 Proactive wake-up
-├── providers/      # 🤖 LLM providers (OpenRouter, etc.)
-├── session/        # 💬 Conversation sessions
-├── config/         # ⚙️ Configuration
-└── cli/            # 🖥️ Commands
+/root/
+├── nanobot/                    ← CÓDIGO (git clone)
+│   ├── nanobot/                ← Código-fonte do bot
+│   │   ├── agent/              #   🧠 Core agent logic (loop, context, memory, tools)
+│   │   ├── channels/           #   📱 Telegram, Discord, WhatsApp, Feishu, DingTalk
+│   │   ├── providers/          #   🤖 LLM providers (OpenRouter, Anthropic, etc.)
+│   │   ├── bus/                #   🚌 Message routing
+│   │   ├── cron/               #   ⏰ Scheduled tasks
+│   │   ├── heartbeat/          #   💓 Proactive wake-up
+│   │   ├── session/            #   💬 Conversation sessions
+│   │   ├── config/             #   ⚙️ Configuration
+│   │   └── cli/                #   🖥️ Commands
+│   ├── bridge/                 ← Bridge WhatsApp (Node.js)
+│   ├── doc/                    ← Documentação
+│   │   └── GUIA_INSTALACAO.md  #   Guia completo para leigos
+│   ├── venv/                   ← Ambiente virtual Python (criado na instalação)
+│   ├── start.sh                ← Script: ativa o venv (usar com source)
+│   ├── help.sh                 ← Script: mostra guia rápido de comandos
+│   ├── pyproject.toml          ← Dependências do projeto
+│   └── config.example.json     ← Exemplo de configuração
+│
+└── .nanobot/                   ← DADOS DE RUNTIME (criado pelo onboard)
+    ├── config.json             ← Configuração real (chaves, modelo, canais)
+    ├── gateway.log             ← Log do servidor
+    ├── sessions/               ← Histórico de conversas
+    ├── cron/                   ← Tarefas agendadas
+    └── workspace/              ← Personalidade do agente (SOUL.md, AGENTS.md)
 ```
+
+> [!CAUTION]
+> Existem **DOIS** diretórios parecidos. O nanobot lê a configuração de `~/.nanobot/config.json`
+> (com ponto). O arquivo `~/nanobot/config.example.json` (sem ponto) é apenas um exemplo.
 
 ## 🤝 Contribute & Roadmap
 
