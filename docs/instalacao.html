@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nanobot - Guia de Instalacao - Ubuntu Limpo</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --bg-card: #161b22;
+      --bg-code: #1c2128;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --accent-hover: #79c0ff;
+      --green: #3fb950;
+      --orange: #d29922;
+      --red: #f85149;
+      --purple: #bc8cff;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 16px;
+    }
+
+    /* HEADER */
+    header {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 0;
+      text-align: center;
+      position: relative;
+    }
+
+    header h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    header h1 span { color: var(--accent); }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* NAV */
+    nav {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    nav li a {
+      display: block;
+      padding: 0.75rem 1rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      border-bottom: 2px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    nav li a:hover,
+    nav li a.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    /* MOBILE NAV TOGGLE */
+    .nav-toggle {
+      display: none;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      width: 100%;
+      text-align: left;
+      border-radius: 0;
+    }
+
+    /* MAIN */
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    /* SECTIONS */
+    section {
+      margin-bottom: 3rem;
+      scroll-margin-top: 60px;
+    }
+
+    h2 {
+      font-size: 1.7rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    h2 .num {
+      color: var(--accent);
+      margin-right: 0.3rem;
+    }
+
+    h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 1.5rem 0 0.7rem;
+      color: var(--text);
+    }
+
+    p { margin-bottom: 1rem; }
+
+    strong { color: var(--text); }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+    /* CODE */
+    pre {
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.2rem;
+      overflow-x: auto;
+      margin: 1rem 0;
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+
+    code {
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      font-size: 0.88em;
+    }
+
+    p code, li code, td code {
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.15em 0.4em;
+      font-size: 0.85em;
+    }
+
+    pre code {
+      background: none;
+      border: none;
+      padding: 0;
+      font-size: inherit;
+    }
+
+    /* TABLES */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.92rem;
+    }
+
+    th, td {
+      padding: 0.6rem 0.8rem;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+
+    th {
+      background: var(--bg-code);
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    td { background: var(--bg-card); }
+
+    tr:hover td { background: #1c2433; }
+
+    /* CARDS */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.2rem 1.5rem;
+      margin: 1rem 0;
+    }
+
+    .card h4 {
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+
+    /* DIAGRAM */
+    .diagram {
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      text-align: center;
+      overflow-x: auto;
+    }
+
+    .diagram pre {
+      display: inline-block;
+      text-align: left;
+      border: none;
+      padding: 0;
+      margin: 0;
+      background: none;
+    }
+
+    /* FLOW STEPS */
+    .flow {
+      position: relative;
+      padding-left: 2.5rem;
+      margin: 1.5rem 0;
+    }
+
+    .flow::before {
+      content: '';
+      position: absolute;
+      left: 0.85rem;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--border);
+    }
+
+    .flow-step {
+      position: relative;
+      margin-bottom: 1.2rem;
+      padding: 0.8rem 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .flow-step::before {
+      content: attr(data-step);
+      position: absolute;
+      left: -2.2rem;
+      top: 0.8rem;
+      width: 1.5rem;
+      height: 1.5rem;
+      background: var(--accent);
+      color: var(--bg);
+      border-radius: 50%;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .flow-step .label {
+      font-weight: 600;
+      color: var(--accent);
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+
+    .flow-step .desc {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+    }
+
+    /* BADGE */
+    .badge {
+      display: inline-block;
+      padding: 0.15em 0.5em;
+      border-radius: 4px;
+      font-size: 0.8em;
+      font-weight: 600;
+    }
+    .badge-green { background: #1a3a2a; color: var(--green); }
+    .badge-orange { background: #3a2e1a; color: var(--orange); }
+    .badge-red { background: #3a1a1a; color: var(--red); }
+    .badge-purple { background: #2a1a3a; color: var(--purple); }
+    .badge-blue { background: #1a2a3a; color: var(--accent); }
+
+    /* UL */
+    ul, ol {
+      margin: 0.5rem 0 1rem 1.5rem;
+    }
+
+    li { margin-bottom: 0.3rem; }
+
+    /* BACK TO TOP */
+    .back-top {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--accent);
+      color: var(--bg);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      font-size: 1.2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .back-top.visible { opacity: 1; }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      border-top: 1px solid var(--border);
+    }
+
+    /* PROMPT COMPARISON */
+    .prompt-box {
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.8rem 1.2rem;
+      margin: 0.5rem 0;
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      font-size: 0.85rem;
+    }
+
+    .prompt-box .prompt-label {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.3rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    }
+
+    .prompt-box .prompt-text {
+      color: var(--green);
+    }
+
+    .prompt-box .prompt-text.muted {
+      color: var(--text-muted);
+    }
+
+    /* WARNING */
+    .warning {
+      background: #3a2e1a;
+      border: 1px solid var(--orange);
+      border-radius: 8px;
+      padding: 1rem 1.2rem;
+      margin: 1rem 0;
+    }
+
+    .warning strong {
+      color: var(--orange);
+    }
+
+    /* SUCCESS */
+    .success {
+      background: #1a3a2a;
+      border: 1px solid var(--green);
+      border-radius: 8px;
+      padding: 1rem 1.2rem;
+      margin: 1rem 0;
+    }
+
+    .success strong {
+      color: var(--green);
+    }
+
+    /* ONE-LINER */
+    .oneliner {
+      background: var(--bg-card);
+      border: 2px solid var(--accent);
+      border-radius: 8px;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+      text-align: center;
+    }
+
+    .oneliner h4 {
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      header h1 { font-size: 1.6rem; }
+      main { padding: 1.5rem 1rem 3rem; }
+      h2 { font-size: 1.4rem; }
+      nav ul { flex-wrap: wrap; }
+      nav li a { padding: 0.5rem 0.7rem; font-size: 0.8rem; }
+      pre { font-size: 0.78rem; padding: 0.8rem; }
+      table { font-size: 0.82rem; }
+      th, td { padding: 0.4rem 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1><span>nanobot</span> &mdash; Guia de Instalacao</h1>
+  <p>Como instalar e operar o nanobot em um servidor Ubuntu limpo, do zero</p>
+</header>
+
+<nav id="navbar">
+  <ul>
+    <li><a href="index.html">&larr; Voltar</a></li>
+    <li><a href="#instalacao">Instalacao</a></li>
+    <li><a href="#uso-diario">Uso Diario</a></li>
+    <li><a href="#estrutura">Estrutura</a></li>
+    <li><a href="#resumo-visual">Resumo Visual</a></li>
+  </ul>
+</nav>
+
+<main>
+
+  <!-- ============================================================ -->
+  <!-- PARTE 1 - INSTALACAO -->
+  <!-- ============================================================ -->
+  <section id="instalacao">
+    <h2>Parte 1 &mdash; Instalacao (so precisa fazer uma vez)</h2>
+    <p>Este guia assume que voce tem um <strong>servidor Ubuntu limpo</strong> (22.04 ou superior) com acesso root. Se voce acabou de criar um VPS na DigitalOcean, Hetzner, Oracle Cloud, etc., siga passo a passo.</p>
+
+    <!-- PASSO 1 -->
+    <h3><span class="num">1.</span> Conectar ao servidor via SSH</h3>
+    <p>No seu computador local, abra o terminal e conecte:</p>
+<pre><code>ssh root@IP_DO_SERVIDOR</code></pre>
+    <p>Substitua <code>IP_DO_SERVIDOR</code> pelo IP real do seu servidor (ex: <code>ssh root@143.198.67.42</code>).</p>
+
+    <!-- PASSO 2 -->
+    <h3><span class="num">2.</span> Atualizar o sistema</h3>
+    <p>Primeiro, atualize a lista de pacotes e instale as versoes mais recentes:</p>
+<pre><code>apt update && apt upgrade -y</code></pre>
+    <div class="card">
+      <h4>O que cada parte faz?</h4>
+      <ul>
+        <li><code>apt update</code> &mdash; Baixa a lista atualizada de pacotes disponiveis (como atualizar o catalogo de uma loja)</li>
+        <li><code>apt upgrade -y</code> &mdash; Instala as versoes mais novas de tudo que ja esta instalado. O <code>-y</code> responde "sim" automaticamente</li>
+      </ul>
+    </div>
+
+    <!-- PASSO 3 -->
+    <h3><span class="num">3.</span> Instalar ferramentas necessarias</h3>
+<pre><code>apt install -y python3 python3-venv python3-pip git</code></pre>
+    <table>
+      <tr><th>Pacote</th><th>O que e</th><th>Por que precisa</th></tr>
+      <tr><td><code>python3</code></td><td>A linguagem Python (versao 3)</td><td>O nanobot e escrito em Python</td></tr>
+      <tr><td><code>python3-venv</code></td><td>Modulo para criar ambientes virtuais</td><td>Isolar as dependencias do nanobot</td></tr>
+      <tr><td><code>python3-pip</code></td><td>Gerenciador de pacotes do Python</td><td>Instalar bibliotecas (litellm, telegram, etc.)</td></tr>
+      <tr><td><code>git</code></td><td>Controle de versao</td><td>Baixar (clonar) o codigo do nanobot</td></tr>
+    </table>
+
+    <!-- PASSO 4 -->
+    <h3><span class="num">4.</span> Clonar o repositorio</h3>
+<pre><code>cd /root && git clone https://github.com/inematds/nanobot.git && cd nanobot</code></pre>
+    <p>Isso baixa todo o codigo do nanobot para a pasta <code>/root/nanobot/</code> e entra nela.</p>
+
+    <!-- PASSO 5 -->
+    <h3><span class="num">5.</span> Criar o ambiente virtual (venv)</h3>
+<pre><code>python3 -m venv venv</code></pre>
+    <div class="card">
+      <h4>O que e um venv?</h4>
+      <p>Pense no <strong>venv</strong> (virtual environment) como uma <strong>caixa isolada</strong>. Dentro dessa caixa, voce instala as bibliotecas que o nanobot precisa, sem afetar o resto do sistema.</p>
+      <p>Sem venv, se voce instalar uma versao de biblioteca pro nanobot, pode quebrar outro programa que usa uma versao diferente. Com venv, cada projeto tem sua propria caixa &mdash; sem conflitos.</p>
+      <p><strong>Analogia:</strong> e como ter um armario separado so para as coisas do nanobot, em vez de misturar tudo na mesma gaveta.</p>
+    </div>
+
+    <!-- PASSO 6 -->
+    <h3><span class="num">6.</span> Ativar o ambiente virtual</h3>
+<pre><code>source venv/bin/activate</code></pre>
+    <p>Depois de ativar, o prompt do terminal muda para mostrar que voce esta dentro do venv:</p>
+    <div class="prompt-box">
+      <div class="prompt-label">Antes (fora do venv):</div>
+      <div class="prompt-text muted">root@servidor:~/nanobot#</div>
+    </div>
+    <div class="prompt-box">
+      <div class="prompt-label">Depois (dentro do venv):</div>
+      <div class="prompt-text">(venv) root@servidor:~/nanobot#</div>
+    </div>
+    <p>O <code>(venv)</code> no inicio confirma que a caixa esta ativa. A partir de agora, tudo que voce instalar com <code>pip</code> vai para dentro dessa caixa.</p>
+
+    <!-- PASSO 7 -->
+    <h3><span class="num">7.</span> Instalar o nanobot</h3>
+<pre><code>pip install -e .</code></pre>
+    <div class="card">
+      <h4>O que cada parte faz?</h4>
+      <ul>
+        <li><code>pip install</code> &mdash; Instala um pacote Python e todas as suas dependencias</li>
+        <li><code>-e</code> &mdash; Modo "editavel" (editable). Em vez de copiar o codigo para outra pasta, cria um atalho. Assim, se voce fizer <code>git pull</code> para atualizar, as mudancas ja valem automaticamente, sem precisar reinstalar</li>
+        <li><code>.</code> &mdash; O ponto significa "o diretorio atual" (ou seja, <code>/root/nanobot/</code>). Diz ao pip para instalar o projeto que esta aqui</li>
+      </ul>
+    </div>
+
+    <!-- PASSO 8 -->
+    <h3><span class="num">8.</span> Executar o onboard</h3>
+<pre><code>nanobot onboard</code></pre>
+    <p>O comando <code>onboard</code> cria a estrutura de diretorios que o nanobot precisa para funcionar:</p>
+<pre><code>~/.nanobot/
++-- config.json          &larr; Configuracao principal (criado vazio)
++-- sessions/            &larr; Pasta para historico de conversas
++-- workspace/           &larr; Area de trabalho do agente
+    +-- AGENTS.md        &larr; Personalidade do agente
+    +-- SOUL.md          &larr; Instrucoes profundas
+    +-- USER.md          &larr; Informacoes sobre voce
+    +-- memory/          &larr; Memoria persistente
+        +-- MEMORY.md    &larr; Memoria de longo prazo</code></pre>
+
+    <!-- PASSO 9 -->
+    <h3><span class="num">9.</span> Editar a configuracao</h3>
+<pre><code>nano ~/.nanobot/config.json</code></pre>
+    <p>Cole o seguinte conteudo (ajustando as chaves):</p>
+<pre><code>{
+  "llm": {
+    "default_model": "openrouter/qwen/qwen3-coder",
+    "api_key": "sk-or-v1-SUA_CHAVE_OPENROUTER_AQUI"
+  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "token": "7388953786:SEU_TOKEN_TELEGRAM_AQUI",
+      "allowFrom": ["SEU_CHAT_ID_AQUI"]
+    }
+  }
+}</code></pre>
+
+    <div class="card">
+      <h4>Onde conseguir cada chave?</h4>
+      <table>
+        <tr><th>Chave</th><th>Onde obter</th><th>Como</th></tr>
+        <tr>
+          <td><code>api_key</code> (OpenRouter)</td>
+          <td><a href="https://openrouter.ai/keys">openrouter.ai/keys</a></td>
+          <td>Crie uma conta, va em "Keys", clique "Create Key". Comeca com <code>sk-or-v1-</code></td>
+        </tr>
+        <tr>
+          <td><code>token</code> (Telegram)</td>
+          <td><a href="https://t.me/BotFather">@BotFather no Telegram</a></td>
+          <td>Mande <code>/newbot</code>, siga as instrucoes, copie o token. Formato: <code>1234567890:ABCdefGHI...</code></td>
+        </tr>
+        <tr>
+          <td><code>allowFrom</code> (Chat ID)</td>
+          <td><a href="https://t.me/userinfobot">@userinfobot no Telegram</a></td>
+          <td>Mande qualquer mensagem para este bot, ele responde seu Chat ID numerico</td>
+        </tr>
+      </table>
+    </div>
+
+    <p>Para salvar no <code>nano</code>: pressione <code>Ctrl+O</code> (salvar), <code>Enter</code> (confirmar), <code>Ctrl+X</code> (sair).</p>
+
+    <!-- PASSO 10 -->
+    <h3><span class="num">10.</span> Proteger a configuracao</h3>
+<pre><code>chmod 600 ~/.nanobot/config.json</code></pre>
+    <p>O <code>chmod 600</code> faz com que <strong>somente o dono</strong> (root) possa ler e escrever esse arquivo. Isso e importante porque o arquivo contem suas chaves de API &mdash; se qualquer usuario do servidor pudesse ler, suas chaves estariam expostas.</p>
+
+    <!-- PASSO 11 -->
+    <h3><span class="num">11.</span> Configurar aliases no .bashrc</h3>
+    <p>Abra o arquivo <code>.bashrc</code>:</p>
+<pre><code>nano ~/.bashrc</code></pre>
+    <p>Adicione estas duas linhas <strong>no final</strong> do arquivo:</p>
+<pre><code>alias nb='cd /root/nanobot && source venv/bin/activate'
+alias nbhelp='cd /root/nanobot && bash help.sh'</code></pre>
+    <p>Depois salve (<code>Ctrl+O</code>, <code>Enter</code>, <code>Ctrl+X</code>) e carregue as mudancas:</p>
+<pre><code>source ~/.bashrc</code></pre>
+
+    <div class="card">
+      <h4>O que e o .bashrc e o que sao aliases?</h4>
+      <p>O <code>.bashrc</code> e um arquivo que o Linux le toda vez que voce abre um terminal. Tudo que estiver la e executado automaticamente.</p>
+      <p>Um <strong>alias</strong> e um atalho &mdash; como um <strong>contato no celular</strong>. Em vez de decorar o numero completo (<code>cd /root/nanobot && source venv/bin/activate</code>), voce salva com um nome curto (<code>nb</code>) e usa so o nome.</p>
+      <table>
+        <tr><th>Alias</th><th>Equivale a</th><th>Para que serve</th></tr>
+        <tr><td><code>nb</code></td><td><code>cd /root/nanobot && source venv/bin/activate</code></td><td>Ativa o ambiente do nanobot rapidamente</td></tr>
+        <tr><td><code>nbhelp</code></td><td><code>cd /root/nanobot && bash help.sh</code></td><td>Mostra o guia rapido de comandos</td></tr>
+      </table>
+    </div>
+
+    <!-- PASSO 12 -->
+    <h3><span class="num">12.</span> Testar a instalacao</h3>
+    <p>Verifique se tudo esta configurado corretamente:</p>
+<pre><code>nanobot status</code></pre>
+    <p>Este comando mostra: modelo configurado, provider detectado, channels habilitados, e se as chaves sao validas.</p>
+    <p>Faca um teste rapido de comunicacao com a IA:</p>
+<pre><code>nanobot agent -m "Ola, estou testando. Responda com uma frase curta."</code></pre>
+    <p>Se tudo estiver certo, voce vera a resposta da IA diretamente no terminal.</p>
+
+    <!-- PASSO 13 -->
+    <h3><span class="num">13.</span> Iniciar o gateway</h3>
+    <p>O gateway e o servidor que fica escutando mensagens dos channels (Telegram, etc.).</p>
+
+    <p><strong>Modo foreground</strong> (para testar &mdash; voce ve os logs ao vivo, <code>Ctrl+C</code> para parar):</p>
+<pre><code>nanobot gateway</code></pre>
+
+    <p><strong>Modo background</strong> (para deixar rodando mesmo depois de fechar o terminal):</p>
+<pre><code>nohup python -m nanobot gateway > ~/.nanobot/gateway.log 2>&1 &</code></pre>
+
+    <div class="card">
+      <h4>O que cada parte do comando background faz?</h4>
+      <ul>
+        <li><code>nohup</code> &mdash; "No hang up": nao para quando voce fechar o terminal</li>
+        <li><code>python -m nanobot gateway</code> &mdash; Inicia o gateway</li>
+        <li><code>&gt; ~/.nanobot/gateway.log</code> &mdash; Redireciona a saida para um arquivo de log</li>
+        <li><code>2&gt;&amp;1</code> &mdash; Erros tambem vao para o mesmo arquivo de log</li>
+        <li><code>&amp;</code> &mdash; Roda em segundo plano (libera o terminal)</li>
+      </ul>
+    </div>
+
+    <div class="success">
+      <strong>Pronto!</strong> Se o gateway iniciou sem erros, mande uma mensagem para o seu bot no Telegram. Ele deve responder.
+    </div>
+
+    <!-- ONE-LINER -->
+    <div class="oneliner">
+      <h4>Resumo em uma linha (para quem ja sabe o que esta fazendo)</h4>
+<pre><code>apt update && apt upgrade -y && apt install -y python3 python3-venv python3-pip git && \
+cd /root && git clone https://github.com/inematds/nanobot.git && cd nanobot && \
+python3 -m venv venv && source venv/bin/activate && pip install -e . && \
+nanobot onboard && nano ~/.nanobot/config.json</code></pre>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- PARTE 2 - USO DIARIO -->
+  <!-- ============================================================ -->
+  <section id="uso-diario">
+    <h2>Parte 2 &mdash; Uso Diario</h2>
+
+    <h3>Entendendo o <code>source</code></h3>
+    <p>Toda vez que voce conectar via SSH, o venv <strong>nao esta ativo</strong>. Voce precisa ativa-lo antes de usar o <code>nanobot</code>.</p>
+
+    <div class="card">
+      <h4>Por que precisa do source toda vez?</h4>
+      <p><strong>Analogia:</strong> imagine que voce entra em um quarto escuro.</p>
+      <ul>
+        <li><strong>Sem <code>source</code></strong> &mdash; E como se outra pessoa entrasse no quarto, acendesse a luz, e saisse. A luz se apaga quando ela sai. Voce continua no escuro.</li>
+        <li><strong>Com <code>source</code></strong> &mdash; Voce mesmo entra e acende a luz. A luz fica acesa enquanto voce estiver la.</li>
+      </ul>
+      <p>O <code>source</code> executa o script <strong>no seu terminal atual</strong>, modificando o ambiente. Sem ele, o script roda em um sub-processo separado e as mudancas se perdem.</p>
+    </div>
+
+    <h3>Scripts disponiveis</h3>
+    <p>O nanobot inclui dois scripts auxiliares na raiz do projeto:</p>
+    <table>
+      <tr><th>Script</th><th>Como executar</th><th>O que faz</th></tr>
+      <tr>
+        <td><code>start.sh</code></td>
+        <td><code>source start.sh</code></td>
+        <td>Entra na pasta do nanobot e ativa o venv. <strong>Precisa do <code>source</code></strong> (ver explicacao acima)</td>
+      </tr>
+      <tr>
+        <td><code>help.sh</code></td>
+        <td><code>bash help.sh</code></td>
+        <td>Mostra um guia rapido com todos os comandos. Nao precisa de <code>source</code> porque so imprime texto</td>
+      </tr>
+    </table>
+
+    <h3>3 formas de ativar o ambiente</h3>
+    <p>Escolha a que preferir &mdash; todas fazem a mesma coisa:</p>
+    <table>
+      <tr><th>#</th><th>Forma</th><th>Comando</th><th>Quando usar</th></tr>
+      <tr>
+        <td>1</td>
+        <td>Alias</td>
+        <td><code>nb</code></td>
+        <td>Forma mais rapida (se configurou o alias no passo 11)</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>Script</td>
+        <td><code>cd /root/nanobot && source start.sh</code></td>
+        <td>Se nao configurou aliases</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>Manual</td>
+        <td><code>cd /root/nanobot && source venv/bin/activate</code></td>
+        <td>Forma classica, funciona sempre</td>
+      </tr>
+    </table>
+
+    <h3>Tabela de comandos</h3>
+    <table>
+      <tr><th>Acao</th><th>Comando</th></tr>
+      <tr>
+        <td>Ver configuracao e status</td>
+        <td><code>nanobot status</code></td>
+      </tr>
+      <tr>
+        <td>Verificar se esta rodando</td>
+        <td><code>ps aux | grep 'nanobot gateway'</code></td>
+      </tr>
+      <tr>
+        <td>Iniciar (foreground)</td>
+        <td><code>nanobot gateway</code></td>
+      </tr>
+      <tr>
+        <td>Iniciar (background)</td>
+        <td><code>nohup python -m nanobot gateway > ~/.nanobot/gateway.log 2>&1 &</code></td>
+      </tr>
+      <tr>
+        <td>Parar</td>
+        <td><code>pkill -f 'nanobot gateway'</code></td>
+      </tr>
+      <tr>
+        <td>Reiniciar</td>
+        <td><code>pkill -f 'nanobot gateway' && sleep 2 && nohup python -m nanobot gateway > ~/.nanobot/gateway.log 2>&1 &</code></td>
+      </tr>
+      <tr>
+        <td>Ver log ao vivo</td>
+        <td><code>tail -f ~/.nanobot/gateway.log</code></td>
+      </tr>
+      <tr>
+        <td>Status dos channels</td>
+        <td><code>nanobot channels status</code></td>
+      </tr>
+      <tr>
+        <td>Listar tarefas cron</td>
+        <td><code>nanobot cron list</code></td>
+      </tr>
+      <tr>
+        <td>Verificar seguranca</td>
+        <td><code>nanobot security-check</code></td>
+      </tr>
+      <tr>
+        <td>Enviar mensagem direto</td>
+        <td><code>nanobot agent -m "Sua mensagem aqui"</code></td>
+      </tr>
+      <tr>
+        <td>Ver ajuda rapida</td>
+        <td><code>nbhelp</code> ou <code>bash help.sh</code></td>
+      </tr>
+    </table>
+
+    <h3>Como atualizar o codigo</h3>
+    <p>Quando houver uma atualizacao no repositorio:</p>
+<pre><code># 1. Parar o gateway (se estiver rodando)
+pkill -f 'nanobot gateway'
+
+# 2. Ativar o ambiente (se nao estiver ativo)
+nb
+
+# 3. Baixar atualizacoes e reinstalar
+git pull && pip install -e .
+
+# 4. Reiniciar o gateway
+nohup python -m nanobot gateway > ~/.nanobot/gateway.log 2>&1 &</code></pre>
+
+    <div class="warning">
+      <strong>Atencao:</strong> O <code>git pull</code> atualiza apenas o <strong>codigo</strong> em <code>/root/nanobot/</code>. Seus dados em <code>~/.nanobot/</code> (config, sessoes, memoria) <strong>nunca sao alterados</strong> pelo git pull.
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- PARTE 3 - ESTRUTURA DE DIRETORIOS -->
+  <!-- ============================================================ -->
+  <section id="estrutura">
+    <h2>Parte 3 &mdash; Estrutura de Diretorios</h2>
+
+    <p>O nanobot usa <strong>duas pastas separadas</strong>. Entender a diferenca e fundamental:</p>
+
+    <div class="diagram">
+<pre><code>/root/nanobot/                        &larr; CODIGO (repositorio git)
++-- nanobot/                          &larr; Codigo-fonte Python
+|   +-- agent/                        &larr; Logica do agente (loop, tools, context)
+|   +-- bus/                          &larr; Message bus (fila)
+|   +-- channels/                     &larr; Telegram, Discord, WhatsApp...
+|   +-- config/                       &larr; Schema e loader de configuracao
+|   +-- providers/                    &larr; Conexao com IAs (LiteLLM)
+|   +-- session/                      &larr; Gerenciador de sessoes
+|   +-- cron/                         &larr; Agendador de tarefas
+|   +-- heartbeat/                    &larr; Servico de heartbeat
+|   +-- security/                     &larr; Rate limit, validacao
+|   +-- skills/                       &larr; Skills embutidos
++-- venv/                             &larr; Ambiente virtual Python
++-- start.sh                          &larr; Script para ativar venv
++-- help.sh                           &larr; Guia rapido de comandos
++-- setup.py / pyproject.toml         &larr; Definicao do pacote
++-- config.json                       &larr; Exemplo de configuracao (NAO usar este!)
++-- docs/                             &larr; Documentacao (esta pagina)
+
+/root/.nanobot/                       &larr; DADOS DE RUNTIME (seus dados pessoais)
++-- config.json                       &larr; SUA configuracao real (chaves, modelo, canais)
++-- gateway.log                       &larr; Log do gateway
++-- sessions/                         &larr; Historico de conversas (.jsonl)
+|   +-- telegram_7388953786.jsonl
++-- workspace/                        &larr; Area de trabalho do agente
+    +-- AGENTS.md                     &larr; Personalidade do agente
+    +-- SOUL.md                       &larr; Instrucoes profundas
+    +-- USER.md                       &larr; Informacoes sobre voce
+    +-- HEARTBEAT.md                  &larr; Instrucoes do heartbeat
+    +-- memory/                       &larr; Memoria persistente
+        +-- MEMORY.md                 &larr; Memoria de longo prazo
+        +-- 2026-02-10.md             &larr; Notas do dia</code></pre>
+    </div>
+
+    <table>
+      <tr><th>Aspecto</th><th><code>/root/nanobot/</code></th><th><code>/root/.nanobot/</code></th></tr>
+      <tr>
+        <td>Conteudo</td>
+        <td>Codigo-fonte do programa</td>
+        <td>Seus dados pessoais</td>
+      </tr>
+      <tr>
+        <td>Controlado por</td>
+        <td><code>git</code> (repositorio)</td>
+        <td>Voce (e o agente)</td>
+      </tr>
+      <tr>
+        <td>Afetado pelo <code>git pull</code>?</td>
+        <td><span class="badge badge-green">Sim</span> &mdash; atualiza o codigo</td>
+        <td><span class="badge badge-red">Nao</span> &mdash; nunca e tocado</td>
+      </tr>
+      <tr>
+        <td>Backup importante?</td>
+        <td>Nao (pode re-clonar)</td>
+        <td><span class="badge badge-orange">Sim!</span> Contem suas chaves e memorias</td>
+      </tr>
+      <tr>
+        <td>Visivel com <code>ls</code>?</td>
+        <td>Sim (pasta normal)</td>
+        <td>Nao (pasta oculta &mdash; precisa de <code>ls -a</code>)</td>
+      </tr>
+    </table>
+
+    <div class="warning">
+      <strong>Cuidado com os DOIS config.json!</strong>
+      <p>Existem <strong>dois</strong> arquivos chamados <code>config.json</code>:</p>
+      <ul>
+        <li><code>/root/nanobot/config.json</code> &mdash; E um <strong>exemplo</strong> que vem com o repositorio. <strong>NAO edite este.</strong></li>
+        <li><code>/root/.nanobot/config.json</code> &mdash; E a sua <strong>configuracao real</strong>. <strong>Edite este.</strong></li>
+      </ul>
+      <p>Se voce editar o arquivo errado, o nanobot nao vai encontrar suas chaves. Sempre use: <code>nano ~/.nanobot/config.json</code></p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- PARTE 4 - RESUMO VISUAL -->
+  <!-- ============================================================ -->
+  <section id="resumo-visual">
+    <h2>Parte 4 &mdash; Resumo Visual</h2>
+
+    <h3>Fluxo: "Acabei de entrar via SSH"</h3>
+    <div class="diagram">
+<pre><code>  +------------------+
+  |  ssh root@IP     |
+  +--------+---------+
+           |
+           v
+  +------------------+
+  |  Digitar: nb     |
+  |  (alias que      |
+  |   ativa o venv)  |
+  +--------+---------+
+           |
+           v
+  +------------------+
+  |  Prompt mostra   |
+  |  (venv) root@... |
+  +--------+---------+
+           |
+     +-----+------+
+     |            |
+     v            v
++---------+  +------------------+
+| Checar  |  | Iniciar gateway  |
+| status  |  +--------+---------+
+| nanobot |           |
+| status  |     +-----+------+
++---------+     |            |
+                v            v
+          +-----------+  +--------------------+
+          | Foreground|  | Background         |
+          | nanobot   |  | nohup python -m    |
+          | gateway   |  | nanobot gateway    |
+          |           |  | > gateway.log 2>&1 &|
+          | (Ctrl+C   |  +--------------------+
+          |  p/ parar)|
+          +-----------+</code></pre>
+    </div>
+
+    <h3>Fluxo: "Quero parar / ver logs"</h3>
+    <div class="diagram">
+<pre><code>  +-------------------------+
+  |  O que voce quer fazer? |
+  +-----+----------+--------+
+        |          |
+        v          v
+  +-----------+  +------------------+
+  |  PARAR    |  |  VER LOGS        |
+  +-----------+  +------------------+
+        |                |
+        v                v
+  +-----------+  +------------------+
+  | pkill -f  |  | tail -f          |
+  | 'nanobot  |  | ~/.nanobot/      |
+  |  gateway' |  | gateway.log      |
+  +-----------+  |                  |
+        |        | (Ctrl+C p/ sair  |
+        v        |  do tail)        |
+  +-----------+  +------------------+
+  | Confirmar |
+  | que parou:|
+  | ps aux |  |
+  | grep      |
+  | nanobot   |
+  +-----------+</code></pre>
+    </div>
+
+    <h3>Fluxo: "Quero atualizar o codigo"</h3>
+    <div class="diagram">
+<pre><code>  +-----------------------+
+  |  1. Parar gateway     |
+  |  pkill -f 'nanobot    |
+  |  gateway'             |
+  +----------+------------+
+             |
+             v
+  +-----------------------+
+  |  2. Ativar venv       |
+  |  nb                   |
+  +----------+------------+
+             |
+             v
+  +-----------------------+
+  |  3. Atualizar         |
+  |  git pull &&          |
+  |  pip install -e .     |
+  +----------+------------+
+             |
+             v
+  +-----------------------+
+  |  4. Reiniciar         |
+  |  nohup python -m      |
+  |  nanobot gateway      |
+  |  > gateway.log 2>&1 & |
+  +-----------------------+</code></pre>
+    </div>
+
+    <div class="card">
+      <h4>Resumo dos comandos mais usados</h4>
+      <table>
+        <tr><th>Situacao</th><th>Comando</th></tr>
+        <tr><td>Entrou no servidor</td><td><code>nb</code></td></tr>
+        <tr><td>Nao lembra dos comandos</td><td><code>nbhelp</code></td></tr>
+        <tr><td>Quer ver se ta rodando</td><td><code>ps aux | grep nanobot</code></td></tr>
+        <tr><td>Quer ver o log</td><td><code>tail -f ~/.nanobot/gateway.log</code></td></tr>
+        <tr><td>Quer parar</td><td><code>pkill -f 'nanobot gateway'</code></td></tr>
+        <tr><td>Quer iniciar</td><td><code>nohup python -m nanobot gateway > ~/.nanobot/gateway.log 2>&1 &</code></td></tr>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<a href="#" class="back-top" id="backTop" title="Voltar ao topo">&uarr;</a>
+
+<footer>
+  <p>nanobot &mdash; Ultra-Lightweight Personal AI Assistant</p>
+  <p><a href="https://github.com/inematds/nanobot">github.com/inematds/nanobot</a></p>
+</footer>
+
+<script>
+  // Back to top button
+  const btn = document.getElementById('backTop');
+  window.addEventListener('scroll', () => {
+    btn.classList.toggle('visible', window.scrollY > 400);
+  });
+
+  // Active nav highlight
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('nav a[href^="#"]');
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(link => {
+          link.classList.toggle('active',
+            link.getAttribute('href') === '#' + entry.target.id
+          );
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -75% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>

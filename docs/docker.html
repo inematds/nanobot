@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nanobot - Guia Docker</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --bg-card: #161b22;
+      --bg-code: #1c2128;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --accent-hover: #79c0ff;
+      --green: #3fb950;
+      --orange: #d29922;
+      --red: #f85149;
+      --purple: #bc8cff;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 16px;
+    }
+
+    /* HEADER */
+    header {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 0;
+      text-align: center;
+      position: relative;
+    }
+
+    header h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    header h1 span { color: var(--accent); }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* NAV */
+    nav {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    nav li a {
+      display: block;
+      padding: 0.75rem 1rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      border-bottom: 2px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    nav li a:hover,
+    nav li a.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    /* MOBILE NAV TOGGLE */
+    .nav-toggle {
+      display: none;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      width: 100%;
+      text-align: left;
+      border-radius: 0;
+    }
+
+    /* MAIN */
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    /* SECTIONS */
+    section {
+      margin-bottom: 3rem;
+      scroll-margin-top: 60px;
+    }
+
+    h2 {
+      font-size: 1.7rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    h2 .num {
+      color: var(--accent);
+      margin-right: 0.3rem;
+    }
+
+    h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 1.5rem 0 0.7rem;
+      color: var(--text);
+    }
+
+    p { margin-bottom: 1rem; }
+
+    strong { color: var(--text); }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+    /* CODE */
+    pre {
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.2rem;
+      overflow-x: auto;
+      margin: 1rem 0;
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+
+    code {
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      font-size: 0.88em;
+    }
+
+    p code, li code, td code {
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.15em 0.4em;
+      font-size: 0.85em;
+    }
+
+    pre code {
+      background: none;
+      border: none;
+      padding: 0;
+      font-size: inherit;
+    }
+
+    /* TABLES */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.92rem;
+    }
+
+    th, td {
+      padding: 0.6rem 0.8rem;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+
+    th {
+      background: var(--bg-code);
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    td { background: var(--bg-card); }
+
+    tr:hover td { background: #1c2433; }
+
+    /* CARDS */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.2rem 1.5rem;
+      margin: 1rem 0;
+    }
+
+    .card h4 {
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+
+    /* DIAGRAM */
+    .diagram {
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      text-align: center;
+      overflow-x: auto;
+    }
+
+    .diagram pre {
+      display: inline-block;
+      text-align: left;
+      border: none;
+      padding: 0;
+      margin: 0;
+      background: none;
+    }
+
+    /* FLOW STEPS */
+    .flow {
+      position: relative;
+      padding-left: 2.5rem;
+      margin: 1.5rem 0;
+    }
+
+    .flow::before {
+      content: '';
+      position: absolute;
+      left: 0.85rem;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--border);
+    }
+
+    .flow-step {
+      position: relative;
+      margin-bottom: 1.2rem;
+      padding: 0.8rem 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .flow-step::before {
+      content: attr(data-step);
+      position: absolute;
+      left: -2.2rem;
+      top: 0.8rem;
+      width: 1.5rem;
+      height: 1.5rem;
+      background: var(--accent);
+      color: var(--bg);
+      border-radius: 50%;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .flow-step .label {
+      font-weight: 600;
+      color: var(--accent);
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+
+    .flow-step .desc {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+    }
+
+    /* BADGE */
+    .badge {
+      display: inline-block;
+      padding: 0.15em 0.5em;
+      border-radius: 4px;
+      font-size: 0.8em;
+      font-weight: 600;
+    }
+    .badge-green { background: #1a3a2a; color: var(--green); }
+    .badge-orange { background: #3a2e1a; color: var(--orange); }
+    .badge-red { background: #3a1a1a; color: var(--red); }
+    .badge-purple { background: #2a1a3a; color: var(--purple); }
+    .badge-blue { background: #1a2a3a; color: var(--accent); }
+
+    /* UL */
+    ul, ol {
+      margin: 0.5rem 0 1rem 1.5rem;
+    }
+
+    li { margin-bottom: 0.3rem; }
+
+    /* COMPARISON GRID */
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .compare-col {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.2rem 1.5rem;
+    }
+
+    .compare-col h4 {
+      margin-bottom: 0.8rem;
+      font-size: 1rem;
+    }
+
+    .compare-col.vps h4 { color: var(--orange); }
+    .compare-col.docker h4 { color: var(--green); }
+
+    .compare-col pre {
+      margin: 0.5rem 0;
+      font-size: 0.8rem;
+    }
+
+    /* OPTION TABS */
+    .option {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.2rem 1.5rem;
+      margin: 1rem 0;
+    }
+
+    .option h4 {
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+
+    /* BACK TO TOP */
+    .back-top {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--accent);
+      color: var(--bg);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      font-size: 1.2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .back-top.visible { opacity: 1; }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      border-top: 1px solid var(--border);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      header h1 { font-size: 1.6rem; }
+      main { padding: 1.5rem 1rem 3rem; }
+      h2 { font-size: 1.4rem; }
+      nav ul { flex-wrap: wrap; }
+      nav li a { padding: 0.5rem 0.7rem; font-size: 0.8rem; }
+      pre { font-size: 0.78rem; padding: 0.8rem; }
+      table { font-size: 0.82rem; }
+      th, td { padding: 0.4rem 0.5rem; }
+      .compare-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1><span>nanobot</span> &mdash; Guia Docker</h1>
+  <p>Como rodar o nanobot em container Docker de forma automatica, segura e reproduzivel</p>
+</header>
+
+<nav id="navbar">
+  <ul>
+    <li><a href="index.html">&larr; Voltar</a></li>
+    <li><a href="#comparacao">Docker vs VPS</a></li>
+    <li><a href="#passo-a-passo">Passo a Passo</a></li>
+    <li><a href="#comandos-diarios">Comandos</a></li>
+    <li><a href="#onde-ficam-dados">Dados</a></li>
+    <li><a href="#vantagens">Vantagens</a></li>
+    <li><a href="#compose-explicado">Compose</a></li>
+  </ul>
+</nav>
+
+<main>
+
+  <!-- SECAO 1: COMPARACAO -->
+  <section id="comparacao">
+    <h2><span class="num">1.</span> Docker vs VPS Direto</h2>
+    <p>Comparacao lado a lado: instalar direto na VPS versus usar Docker.</p>
+
+    <div class="compare-grid">
+      <div class="compare-col vps">
+        <h4>VPS Direto (manual)</h4>
+<pre><code># Instalar dependencias do sistema
+sudo apt update
+sudo apt install python3.12 python3.12-venv nodejs npm
+
+# Criar e ativar ambiente virtual
+python3.12 -m venv .venv
+source .venv/bin/activate
+
+# Instalar o nanobot
+pip install .
+
+# Configurar
+nanobot onboard
+
+# Iniciar manualmente
+nanobot gateway</code></pre>
+        <p><span class="badge badge-orange">6 passos manuais</span></p>
+        <ul>
+          <li>Precisa instalar Python, Node, venv manualmente</li>
+          <li>Ambiente virtual necessario</li>
+          <li>Se a VPS reiniciar, precisa iniciar de novo</li>
+          <li>Sem limites de recursos automaticos</li>
+        </ul>
+      </div>
+
+      <div class="compare-col docker">
+        <h4>Docker (automatico)</h4>
+<pre><code># Clonar e iniciar
+git clone https://github.com/inematds/nanobot.git
+cd nanobot
+docker compose up -d
+
+# Configurar (apenas primeira vez)
+docker compose exec nanobot nanobot onboard</code></pre>
+        <p><span class="badge badge-green">2 comandos</span></p>
+        <ul>
+          <li>Python, Node, dependencias ja vem no container</li>
+          <li>Sem venv &mdash; tudo isolado por natureza</li>
+          <li>Reinicia automaticamente (<code>unless-stopped</code>)</li>
+          <li>Limites de RAM/CPU configurados</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <h4>Resumo</h4>
+      <p>Com Docker, o <code>Dockerfile</code> automatiza toda a instalacao. Voce so precisa de <code>docker compose up -d</code> e o container ja sai rodando com Python 3.12, Node.js 20, todas as dependencias instaladas, usuario non-root, e o gateway iniciado automaticamente.</p>
+    </div>
+  </section>
+
+  <!-- SECAO 2: PASSO A PASSO -->
+  <section id="passo-a-passo">
+    <h2><span class="num">2.</span> Passo a Passo</h2>
+
+    <div class="flow">
+
+      <!-- Passo 1: Clone -->
+      <div class="flow-step" data-step="1">
+        <span class="label">Clonar o repositorio</span>
+        <span class="desc">Baixe o codigo fonte do GitHub:</span>
+<pre><code>git clone https://github.com/inematds/nanobot.git && cd nanobot</code></pre>
+      </div>
+
+      <!-- Passo 2: Build e Start -->
+      <div class="flow-step" data-step="2">
+        <span class="label">Build e start com Docker Compose</span>
+        <span class="desc">Um unico comando faz tudo:</span>
+<pre><code>docker compose up -d</code></pre>
+        <span class="desc">A flag <code>-d</code> significa <strong>detached</strong> (modo desacoplado) &mdash; o container roda em segundo plano e voce recupera o terminal.</span>
+        <span class="desc" style="display:block; margin-top:0.8rem;">O que acontece internamente durante o build:</span>
+        <table>
+          <tr><th>Etapa</th><th>Comando no Dockerfile</th><th>O que faz</th></tr>
+          <tr><td>Imagem base</td><td><code>FROM python:3.12-bookworm-slim</code></td><td>Usa Python 3.12 com Debian slim como base (imagem otimizada com <code>uv</code> integrado)</td></tr>
+          <tr><td>Node.js</td><td><code>apt-get install nodejs</code></td><td>Instala Node.js 20 para a bridge do WhatsApp</td></tr>
+          <tr><td>Usuario</td><td><code>useradd -m nanobot</code></td><td>Cria usuario non-root por seguranca (nunca roda como root)</td></tr>
+          <tr><td>Python deps</td><td><code>uv pip install --system .</code></td><td>Instala todas as dependencias Python sem precisar de venv (usa <code>uv</code> que e 10-100x mais rapido que pip)</td></tr>
+          <tr><td>WhatsApp bridge</td><td><code>npm install && npm run build</code></td><td>Compila a bridge Node.js para WhatsApp (Baileys)</td></tr>
+          <tr><td>Diretorios</td><td><code>mkdir -p ~/.nanobot/...</code></td><td>Cria toda a estrutura de pastas: workspace, sessions, memory, skills, cron, history</td></tr>
+          <tr><td>Inicializacao</td><td><code>CMD ["gateway"]</code></td><td>Quando o container inicia, roda <code>nanobot gateway</code> automaticamente</td></tr>
+        </table>
+      </div>
+
+      <!-- Passo 3: Onboard -->
+      <div class="flow-step" data-step="3">
+        <span class="label">Rodar o onboard (primeira vez)</span>
+        <span class="desc">O assistente interativo de configuracao:</span>
+<pre><code>docker compose exec nanobot nanobot onboard</code></pre>
+        <span class="desc">Esse comando entra no container e roda o <code>nanobot onboard</code>, que guia voce passo a passo para configurar provider (API key), modelo, e canal de chat (Telegram, Discord, etc.).</span>
+      </div>
+
+      <!-- Passo 4: Configuracao -->
+      <div class="flow-step" data-step="4">
+        <span class="label">Adicionar/editar configuracao</span>
+        <span class="desc">Se precisar editar a configuracao manualmente, existem 3 opcoes:</span>
+      </div>
+
+    </div>
+
+    <!-- Opcao A -->
+    <div class="option">
+      <h4>Opcao A: Copiar arquivo para dentro do container</h4>
+      <p>Primeiro, crie o arquivo <code>config.json</code> na sua maquina local:</p>
+<pre><code class="language-json">{
+  "llm": {
+    "provider": "openrouter",
+    "model": "openrouter/qwen/qwen3-coder-next",
+    "api_key": "sk-or-v1-SEU-TOKEN-AQUI"
+  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "token": "1234567890:ABCdefGHI-seu-token-bot-telegram",
+      "allowFrom": ["seu_user_id_aqui"]
+    }
+  }
+}</code></pre>
+      <p>Depois, copie para dentro do container:</p>
+<pre><code>docker compose cp config.json nanobot:/home/nanobot/.nanobot/config.json</code></pre>
+    </div>
+
+    <!-- Opcao B -->
+    <div class="option">
+      <h4>Opcao B: Editar dentro do container</h4>
+      <p>Entre no container e edite diretamente:</p>
+<pre><code># Entrar no container
+docker compose exec nanobot bash
+
+# Editar a configuracao (nano ja disponivel no container)
+nano ~/.nanobot/config.json
+
+# Quando terminar, sair do container
+exit</code></pre>
+    </div>
+
+    <!-- Opcao C -->
+    <div class="option">
+      <h4>Opcao C: Variaveis de ambiente no docker-compose.yml</h4>
+      <p>Adicione as chaves diretamente no <code>docker-compose.yml</code>:</p>
+<pre><code class="language-yaml">services:
+  nanobot:
+    build: .
+    environment:
+      - NANOBOT_PROVIDERS__OPENROUTER__API_KEY=sk-or-v1-SEU-TOKEN
+      - NANOBOT_PROVIDERS__ANTHROPIC__API_KEY=sk-ant-SEU-TOKEN
+      - NANOBOT_CHANNELS__TELEGRAM__TOKEN=1234567890:ABCdef
+      - TZ=America/Sao_Paulo</code></pre>
+      <p>Vantagem: as chaves ficam no arquivo compose e nao precisam ser copiadas para dentro do container. Desvantagem: ficam visiveis no arquivo YAML (nao commitar no git!).</p>
+    </div>
+
+    <div class="flow">
+
+      <!-- Passo 5: Restart -->
+      <div class="flow-step" data-step="5">
+        <span class="label">Reiniciar para aplicar a configuracao</span>
+        <span class="desc">Apos alterar a configuracao, reinicie o container:</span>
+<pre><code>docker compose restart</code></pre>
+      </div>
+
+      <!-- Passo 6: Verificar -->
+      <div class="flow-step" data-step="6">
+        <span class="label">Verificar se esta funcionando</span>
+        <span class="desc">Confira os logs, status e envie uma mensagem de teste:</span>
+<pre><code># Ver os logs em tempo real
+docker compose logs -f nanobot
+
+# Verificar o status do nanobot
+docker compose exec nanobot nanobot status
+
+# Enviar mensagem de teste (se configurou Telegram)
+# Basta mandar uma mensagem no Telegram para o bot!</code></pre>
+        <span class="desc">Nos logs, procure por linhas como:</span>
+<pre><code>INFO  Gateway started on port 18790
+INFO  TelegramChannel connected
+INFO  Agent loop running</code></pre>
+        <span class="desc">Se aparecerem erros, verifique se o <code>config.json</code> tem as chaves corretas e se o token do Telegram esta valido.</span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECAO 3: COMANDOS DIARIOS -->
+  <section id="comandos-diarios">
+    <h2><span class="num">3.</span> Comandos do Dia a Dia</h2>
+    <p>Tabela de referencia rapida para operacoes comuns:</p>
+
+    <table>
+      <tr><th>Acao</th><th>Comando</th><th>Descricao</th></tr>
+      <tr>
+        <td><span class="badge badge-green">Iniciar</span></td>
+        <td><code>docker compose up -d</code></td>
+        <td>Inicia o container em segundo plano (cria se nao existir)</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-red">Parar</span></td>
+        <td><code>docker compose stop</code></td>
+        <td>Para o container sem remover (dados preservados)</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-orange">Reiniciar</span></td>
+        <td><code>docker compose restart</code></td>
+        <td>Para e inicia novamente (aplica mudancas de config)</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-blue">Ver logs</span></td>
+        <td><code>docker compose logs -f nanobot</code></td>
+        <td>Mostra logs em tempo real (<code>-f</code> = follow). <code>Ctrl+C</code> para sair</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-blue">Status</span></td>
+        <td><code>docker compose ps</code></td>
+        <td>Mostra se o container esta rodando, porta, e tempo de uptime</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-purple">Entrar no container</span></td>
+        <td><code>docker compose exec nanobot bash</code></td>
+        <td>Abre um terminal bash dentro do container</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-blue">Enviar mensagem</span></td>
+        <td><code>docker compose exec nanobot nanobot send "Ola!"</code></td>
+        <td>Envia uma mensagem diretamente pelo CLI</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-green">Atualizar codigo</span></td>
+        <td><code>git pull && docker compose up -d --build</code></td>
+        <td>Baixa codigo novo do GitHub e reconstroi o container</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-red">Remover tudo</span></td>
+        <td><code>docker compose down</code></td>
+        <td>Remove container (dados no volume sao preservados)</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-red">Remover tudo + dados</span></td>
+        <td><code>docker compose down -v</code></td>
+        <td>Remove container E o volume de dados (perda permanente!)</td>
+      </tr>
+    </table>
+  </section>
+
+  <!-- SECAO 4: ONDE FICAM OS DADOS -->
+  <section id="onde-ficam-dados">
+    <h2><span class="num">4.</span> Onde Ficam os Dados</h2>
+    <p>Comparacao entre instalacao direta na VPS e via Docker:</p>
+
+    <table>
+      <tr><th>Item</th><th>VPS Direto</th><th>Docker</th></tr>
+      <tr>
+        <td>Codigo fonte</td>
+        <td><code>~/nanobot/</code> (onde voce clonou)</td>
+        <td><code>/app/</code> dentro do container</td>
+      </tr>
+      <tr>
+        <td>Configuracao</td>
+        <td><code>~/.nanobot/config.json</code></td>
+        <td><code>/home/nanobot/.nanobot/config.json</code> (no volume <code>nanobot-data</code>)</td>
+      </tr>
+      <tr>
+        <td>Sessoes</td>
+        <td><code>~/.nanobot/sessions/</code></td>
+        <td><code>/home/nanobot/.nanobot/sessions/</code> (no volume)</td>
+      </tr>
+      <tr>
+        <td>Workspace</td>
+        <td><code>~/.nanobot/workspace/</code></td>
+        <td><code>/home/nanobot/.nanobot/workspace/</code> (no volume)</td>
+      </tr>
+      <tr>
+        <td>Venv necessario?</td>
+        <td><span class="badge badge-orange">Sim</span> &mdash; precisa criar e ativar</td>
+        <td><span class="badge badge-green">Nao</span> &mdash; container ja e isolado</td>
+      </tr>
+      <tr>
+        <td>Sobrevive reboot?</td>
+        <td><span class="badge badge-orange">Depende</span> &mdash; precisa de systemd/cron</td>
+        <td><span class="badge badge-green">Sim</span> &mdash; <code>restart: unless-stopped</code></td>
+      </tr>
+      <tr>
+        <td>Limites de recursos?</td>
+        <td><span class="badge badge-red">Nao</span> &mdash; precisa configurar manualmente</td>
+        <td><span class="badge badge-green">Sim</span> &mdash; 2GB RAM, 2 CPUs (no compose)</td>
+      </tr>
+    </table>
+
+    <div class="card">
+      <h4>Volume persistente</h4>
+      <p>Todos os dados do nanobot (config, sessoes, memoria, workspace, cron, historico) ficam no volume Docker <code>nanobot-data</code>. Isso significa que mesmo se voce destruir e recriar o container (<code>docker compose down && docker compose up -d</code>), seus dados continuam intactos. Apenas <code>docker compose down -v</code> remove o volume (e os dados com ele).</p>
+    </div>
+  </section>
+
+  <!-- SECAO 5: VANTAGENS -->
+  <section id="vantagens">
+    <h2><span class="num">5.</span> Vantagens do Docker</h2>
+
+    <div class="card">
+      <h4>Auto-restart</h4>
+      <p>Com <code>restart: unless-stopped</code>, o container reinicia automaticamente se o processo cair, se houver um erro inesperado, ou se a VPS reiniciar. Voce so precisa parar manualmente se quiser.</p>
+    </div>
+
+    <div class="card">
+      <h4>Isolamento total</h4>
+      <p>O nanobot roda num ambiente completamente separado do seu sistema. As dependencias do container nao interferem nas suas, e vice-versa. Se algo der errado dentro do container, seu sistema nao e afetado.</p>
+    </div>
+
+    <div class="card">
+      <h4>Limites de recursos</h4>
+      <p>O <code>docker-compose.yml</code> ja vem configurado com limites seguros:</p>
+      <ul>
+        <li><strong>Memoria:</strong> maximo 2GB (reserva minima de 512MB)</li>
+        <li><strong>CPU:</strong> maximo 2 nucleos</li>
+        <li><strong>Tmpfs:</strong> /tmp limitado a 100MB</li>
+      </ul>
+      <p>Isso impede que um bug ou loop infinito consuma todos os recursos da sua VPS.</p>
+    </div>
+
+    <div class="card">
+      <h4>Seguranca (non-root + no-new-privileges)</h4>
+      <p>O container roda como usuario <code>nanobot</code> (nao root), e a flag <code>no-new-privileges:true</code> impede que qualquer processo dentro do container eleve seus privilegios. Mesmo que alguem explorasse uma vulnerabilidade, nao conseguiria virar root.</p>
+    </div>
+
+    <div class="card">
+      <h4>Volume persistente</h4>
+      <p>O volume <code>nanobot-data</code> mantem todos os dados entre restarts, rebuilds e atualizacoes. Voce pode atualizar o codigo (<code>git pull && docker compose up -d --build</code>) sem perder nenhuma configuracao, sessao ou memoria.</p>
+    </div>
+
+    <div class="card">
+      <h4>Healthcheck integrado</h4>
+      <p>O Dockerfile inclui um healthcheck que roda <code>nanobot status</code> a cada 30 segundos. O Docker monitora isso e pode reiniciar o container se ele ficar "unhealthy". Voce pode ver o status de saude com <code>docker compose ps</code>.</p>
+    </div>
+  </section>
+
+  <!-- SECAO 6: COMPOSE EXPLICADO -->
+  <section id="compose-explicado">
+    <h2><span class="num">6.</span> docker-compose.yml Explicado</h2>
+    <p>O arquivo completo com comentarios explicando cada linha:</p>
+
+<pre><code class="language-yaml">services:
+  nanobot:
+    build: .                          # Constroi a imagem usando o Dockerfile na raiz
+    container_name: nanobot           # Nome fixo do container (facilita comandos)
+    restart: unless-stopped           # Reinicia sempre, exceto se voce parar manualmente
+
+    ports:
+      - "127.0.0.1:18790:18790"      # Expoe a porta do gateway apenas no localhost
+                                      # (127.0.0.1 = nao acessivel externamente)
+
+    volumes:
+      # Volume nomeado que persiste TODOS os dados do nanobot:
+      # config.json, sessoes, workspace, memoria, cron, historico
+      - nanobot-data:/home/nanobot/.nanobot
+
+    environment:
+      # Opcional: passar API keys via variaveis de ambiente
+      # (alternativa ao config.json)
+      # - NANOBOT_PROVIDERS__OPENROUTER__API_KEY=sk-or-xxx
+      # - NANOBOT_PROVIDERS__ANTHROPIC__API_KEY=sk-ant-xxx
+      - TZ=America/Sao_Paulo          # Fuso horario para cron e logs
+
+    # Limites de recursos (protecao contra consumo excessivo)
+    deploy:
+      resources:
+        limits:
+          memory: 2G                   # Maximo 2GB de RAM
+          cpus: "2.0"                  # Maximo 2 nucleos de CPU
+        reservations:
+          memory: 512M                 # Minimo 512MB reservados
+
+    # Seguranca: impede escalacao de privilegios
+    security_opt:
+      - no-new-privileges:true         # Nenhum processo pode ganhar privilegios extras
+
+    read_only: false                   # Permite escrita (necessario para sessoes/workspace)
+
+    tmpfs:
+      - /tmp:size=100M                 # /tmp em memoria, limitado a 100MB
+
+# Volume nomeado (persiste dados independente do container)
+volumes:
+  nanobot-data:
+    driver: local                      # Armazenamento local no disco da VPS</code></pre>
+
+    <h3>Dockerfile resumido</h3>
+    <p>Para referencia, o que o Dockerfile faz em cada etapa:</p>
+
+<pre><code class="language-dockerfile"># 1. Imagem base com Python 3.12 + uv (instalador rapido de pacotes)
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
+
+# 2. Instala Node.js 20 (necessario para a bridge WhatsApp)
+RUN apt-get update && apt-get install -y nodejs ...
+
+# 3. Cria usuario non-root por seguranca
+RUN useradd -m -s /bin/bash nanobot
+
+# 4. Instala dependencias Python (cache otimizado em camadas)
+COPY pyproject.toml README.md LICENSE ./
+RUN uv pip install --system --no-cache .
+
+# 5. Copia codigo fonte e reinstala
+COPY nanobot/ nanobot/
+COPY bridge/ bridge/
+RUN uv pip install --system --no-cache .
+
+# 6. Compila a bridge WhatsApp
+RUN npm install && npm run build
+
+# 7. Cria estrutura de diretorios com permissoes corretas
+RUN mkdir -p /home/nanobot/.nanobot/workspace/memory \
+             /home/nanobot/.nanobot/workspace/skills \
+             /home/nanobot/.nanobot/sessions \
+             /home/nanobot/.nanobot/cron \
+             /home/nanobot/.nanobot/history && \
+    chown -R nanobot:nanobot /home/nanobot/.nanobot
+
+# 8. Troca para usuario non-root
+USER nanobot
+
+# 9. Healthcheck automatico a cada 30s
+HEALTHCHECK --interval=30s --timeout=5s \
+    CMD nanobot status || exit 1
+
+# 10. Comando padrao: inicia o gateway
+ENTRYPOINT ["nanobot"]
+CMD ["gateway"]</code></pre>
+  </section>
+
+</main>
+
+<a href="#" class="back-top" id="backTop" title="Voltar ao topo">&uarr;</a>
+
+<footer>
+  <p>nanobot &mdash; Ultra-Lightweight Personal AI Assistant</p>
+  <p><a href="https://github.com/inematds/nanobot">github.com/inematds/nanobot</a></p>
+</footer>
+
+<script>
+  // Back to top button
+  const btn = document.getElementById('backTop');
+  window.addEventListener('scroll', () => {
+    btn.classList.toggle('visible', window.scrollY > 400);
+  });
+
+  // Active nav highlight
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('nav a[href^="#"]');
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(link => {
+          link.classList.toggle('active',
+            link.getAttribute('href') === '#' + entry.target.id
+          );
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -75% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>
