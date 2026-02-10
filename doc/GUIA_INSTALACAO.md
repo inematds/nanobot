@@ -113,8 +113,8 @@ nano ~/.nanobot/config.json
   "channels": {
     "telegram": {
       "enabled": true,
-      "token": "SEU_TOKEN_TELEGRAM_AQUI",
-      "allowFrom": ["SEU_ID_TELEGRAM"]
+      "token": "SEU_TOKEN_DO_BOTFATHER",
+      "allowFrom": ["SEU_ID_NUMERICO"]
     }
   }
 }
@@ -123,9 +123,9 @@ nano ~/.nanobot/config.json
 Para salvar no nano: `Ctrl+O`, Enter, `Ctrl+X`.
 
 **Onde conseguir cada coisa:**
-- Chave OpenRouter → https://openrouter.ai/keys
-- Token Telegram → Fala com o @BotFather no Telegram, cria um bot, ele te da o token
-- Seu ID Telegram → Fala com o @userinfobot no Telegram
+- **Chave OpenRouter** → https://openrouter.ai/keys (crie uma conta, gere uma chave)
+- **Token Telegram** → Abra o Telegram, busque `@BotFather`, envie `/newbot`, siga as instrucoes. Ele te da um token tipo `123456789:ABCdefGHIjklMNOpqrsTUVwxyz`
+- **Seu ID Telegram** → Busque `@userinfobot` no Telegram, envie qualquer mensagem. Ele responde com seu ID numerico (ex: `987654321`)
 
 ### 10. Proteger o config
 

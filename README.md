@@ -231,7 +231,7 @@ nano ~/.nanobot/config.json
 > - [DeepSeek](https://platform.deepseek.com) — DeepSeek direto
 > - [Brave Search](https://brave.com/search/api/) — busca web (opcional)
 
-**Exemplo mínimo com OpenRouter** (recomendado):
+**Exemplo mínimo com OpenRouter + Telegram** (recomendado):
 ```json
 {
   "providers": {
@@ -241,13 +241,20 @@ nano ~/.nanobot/config.json
   },
   "agents": {
     "defaults": {
-      "model": "anthropic/claude-sonnet-4.5"
+      "model": "qwen/qwen3-coder-next"
+    }
+  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "token": "SEU_TOKEN_DO_BOTFATHER",
+      "allowFrom": ["SEU_ID_NUMERICO"]
     }
   }
 }
 ```
 
-**Exemplo mínimo com Anthropic direto:**
+**Exemplo mínimo com Anthropic direto + Telegram:**
 ```json
 {
   "providers": {
@@ -258,6 +265,13 @@ nano ~/.nanobot/config.json
   "agents": {
     "defaults": {
       "model": "anthropic/claude-sonnet-4-5-20250929"
+    }
+  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "token": "SEU_TOKEN_DO_BOTFATHER",
+      "allowFrom": ["SEU_ID_NUMERICO"]
     }
   }
 }
