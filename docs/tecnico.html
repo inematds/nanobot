@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nanobot - Documentacao Tecnica</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --bg-card: #161b22;
+      --bg-code: #1c2128;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --accent-hover: #79c0ff;
+      --green: #3fb950;
+      --orange: #d29922;
+      --red: #f85149;
+      --purple: #bc8cff;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 16px;
+    }
+
+    /* HEADER */
+    header {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 0;
+      text-align: center;
+      position: relative;
+    }
+
+    header h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    header h1 span { color: var(--accent); }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* NAV */
+    nav {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    nav li a {
+      display: block;
+      padding: 0.75rem 1rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      border-bottom: 2px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    nav li a:hover,
+    nav li a.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    /* MAIN */
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    /* SECTIONS */
+    section {
+      margin-bottom: 3rem;
+      scroll-margin-top: 60px;
+    }
+
+    h2 {
+      font-size: 1.7rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    h2 .num {
+      color: var(--accent);
+      margin-right: 0.3rem;
+    }
+
+    h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 1.5rem 0 0.7rem;
+      color: var(--text);
+    }
+
+    h4 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin: 1.2rem 0 0.5rem;
+      color: var(--text);
+    }
+
+    p { margin-bottom: 1rem; }
+
+    strong { color: var(--text); }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+    /* CODE */
+    pre {
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.2rem;
+      overflow-x: auto;
+      margin: 1rem 0;
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+
+    code {
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      font-size: 0.88em;
+    }
+
+    p code, li code, td code {
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.15em 0.4em;
+      font-size: 0.85em;
+    }
+
+    pre code {
+      background: none;
+      border: none;
+      padding: 0;
+      font-size: inherit;
+    }
+
+    /* TABLES */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.92rem;
+    }
+
+    th, td {
+      padding: 0.6rem 0.8rem;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+
+    th {
+      background: var(--bg-code);
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    td { background: var(--bg-card); }
+
+    tr:hover td { background: #1c2433; }
+
+    /* CARDS */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.2rem 1.5rem;
+      margin: 1rem 0;
+    }
+
+    .card h4 {
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+
+    /* DIAGRAM */
+    .diagram {
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      text-align: center;
+      overflow-x: auto;
+    }
+
+    .diagram pre {
+      display: inline-block;
+      text-align: left;
+      border: none;
+      padding: 0;
+      margin: 0;
+      background: none;
+    }
+
+    /* FLOW STEPS */
+    .flow {
+      position: relative;
+      padding-left: 2.5rem;
+      margin: 1.5rem 0;
+    }
+
+    .flow::before {
+      content: '';
+      position: absolute;
+      left: 0.85rem;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--border);
+    }
+
+    .flow-step {
+      position: relative;
+      margin-bottom: 1.2rem;
+      padding: 0.8rem 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .flow-step::before {
+      content: attr(data-step);
+      position: absolute;
+      left: -2.2rem;
+      top: 0.8rem;
+      width: 1.5rem;
+      height: 1.5rem;
+      background: var(--accent);
+      color: var(--bg);
+      border-radius: 50%;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .flow-step .label {
+      font-weight: 600;
+      color: var(--accent);
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+
+    .flow-step .desc {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+    }
+
+    .flow-step .limit-tag {
+      display: inline-block;
+      background: #3a2e1a;
+      color: var(--orange);
+      padding: 0.1em 0.45em;
+      border-radius: 4px;
+      font-size: 0.78em;
+      font-weight: 600;
+      margin-top: 0.3rem;
+    }
+
+    /* BADGE */
+    .badge {
+      display: inline-block;
+      padding: 0.15em 0.5em;
+      border-radius: 4px;
+      font-size: 0.8em;
+      font-weight: 600;
+    }
+    .badge-green { background: #1a3a2a; color: var(--green); }
+    .badge-orange { background: #3a2e1a; color: var(--orange); }
+    .badge-red { background: #3a1a1a; color: var(--red); }
+    .badge-purple { background: #2a1a3a; color: var(--purple); }
+    .badge-blue { background: #1a2a3a; color: var(--accent); }
+
+    /* COMPARISON BOX */
+    .comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .comparison .side {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.2rem 1.5rem;
+    }
+
+    .comparison .side h4 {
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .comparison .side.queue-side h4 { color: var(--orange); }
+    .comparison .side.session-side h4 { color: var(--green); }
+
+    .comparison .side ul {
+      margin: 0.5rem 0 0 1.2rem;
+    }
+
+    .comparison .side li {
+      margin-bottom: 0.3rem;
+      font-size: 0.92rem;
+      color: var(--text-muted);
+    }
+
+    /* UL */
+    ul, ol {
+      margin: 0.5rem 0 1rem 1.5rem;
+    }
+
+    li { margin-bottom: 0.3rem; }
+
+    /* BACK TO TOP */
+    .back-top {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--accent);
+      color: var(--bg);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      font-size: 1.2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .back-top.visible { opacity: 1; }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ANALOGY BOX */
+    .analogy {
+      background: #1a2a3a;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      padding: 1.2rem 1.5rem;
+      margin: 1rem 0;
+    }
+
+    .analogy h4 {
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .analogy p {
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .analogy p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* LAYER BOX */
+    .layer {
+      background: var(--bg-card);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 1rem 1.2rem;
+      margin: 0.8rem 0;
+    }
+
+    .layer h4 {
+      color: var(--accent);
+      margin-bottom: 0.3rem;
+    }
+
+    .layer p, .layer ul {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      header h1 { font-size: 1.6rem; }
+      main { padding: 1.5rem 1rem 3rem; }
+      h2 { font-size: 1.4rem; }
+      nav ul { flex-wrap: wrap; }
+      nav li a { padding: 0.5rem 0.7rem; font-size: 0.8rem; }
+      pre { font-size: 0.78rem; padding: 0.8rem; }
+      table { font-size: 0.82rem; }
+      th, td { padding: 0.4rem 0.5rem; }
+      .comparison { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1><span>nanobot</span> &mdash; Documentacao Tecnica</h1>
+  <p>Referencia completa dos internos: cada arquivo, cada limite, cada camada de protecao</p>
+</header>
+
+<nav id="navbar">
+  <ul>
+    <li><a href="index.html">&larr; Voltar</a></li>
+    <li style="border-left: 1px solid #30363d; margin-left: 0.5rem;"><a href="#mapa">Mapa dos Programas</a></li>
+    <li><a href="#limites">Limites e Protecoes</a></li>
+    <li><a href="#rate-limiting">Rate Limiting</a></li>
+    <li><a href="#ciclo-vida">Ciclo de Vida</a></li>
+    <li><a href="#fila-processamento">Fila e Concorrencia</a></li>
+    <li><a href="#seguranca">Seguranca</a></li>
+    <li><a href="#armazenamento">Armazenamento</a></li>
+  </ul>
+</nav>
+
+<main>
+
+  <!-- =========================================================== -->
+  <!-- 1. MAPA DOS PROGRAMAS                                       -->
+  <!-- =========================================================== -->
+  <section id="mapa">
+    <h2><span class="num">1.</span> Mapa dos Programas</h2>
+    <p>Cada arquivo do projeto, onde mora e o que faz. A coluna <strong>Linhas</strong> e aproximada &mdash; o projeto todo soma ~3.400 linhas de Python.</p>
+
+    <h3>Agent &mdash; O cerebro</h3>
+    <table>
+      <tr><th>Arquivo</th><th>Linhas</th><th>O que faz</th></tr>
+      <tr>
+        <td><code>nanobot/agent/loop.py</code></td>
+        <td>406</td>
+        <td>Motor principal &mdash; recebe mensagens, chama LLM, executa tools</td>
+      </tr>
+      <tr>
+        <td><code>nanobot/agent/context.py</code></td>
+        <td>~130</td>
+        <td>Monta o prompt &mdash; junta bootstrap files, memoria, skills, historico</td>
+      </tr>
+      <tr>
+        <td><code>nanobot/agent/subagent.py</code></td>
+        <td>~90</td>
+        <td>Gerencia subagentes (max 5 simultaneos)</td>
+      </tr>
+      <tr>
+        <td><code>nanobot/agent/memory.py</code></td>
+        <td>~80</td>
+        <td>Memoria do agente (lembrar coisas entre sessoes)</td>
+      </tr>
+      <tr>
+        <td><code>nanobot/agent/skills.py</code></td>
+        <td>~100</td>
+        <td>Carrega skills sob demanda</td>
+      </tr>
+    </table>
+
+    <h3>Tools &mdash; As maos do agente</h3>
+    <table>
+      <tr><th>Arquivo</th><th>Linhas</th><th>O que faz</th></tr>
+      <tr>
+        <td><code>nanobot/agent/tools/registry.py</code></td>
+        <td>~50</td>
+        <td>Registro central de tools disponiveis</td>
+      </tr>
+      <tr>
+        <td><code>nanobot/agent/tools/filesystem.py</code></td>
+        <td>~120</td>
+        <td>Tools: <code>read_file</code>, <code>write_file</code>, <code>edit_file</code>, <code>list_dir</code></td>
+      </tr>
+      <tr>
+        <td><code>nanobot/agent/tools/shell.py</code></td>
+        <td>~130</td>
+        <td>Tool: <code>exec</code> (executa comandos no terminal)</td>
+      </tr>
+      <tr>
+        <td><code>nanobot/agent/tools/web.py</code></td>
+        <td>~170</td>
+        <td>Tools: <code>web_search</code>, <code>web_fetch</code></td>
+      </tr>
+      <tr>
+        <td><code>nanobot/agent/tools/message.py</code></td>
+        <td>~40</td>
+        <td>Tool: <code>message</code> (envia mensagem pro usuario)</td>
+      </tr>
+      <tr>
+        <td><code>nanobot/agent/tools/spawn.py</code></td>
+        <td>~60</td>
+        <td>Tool: <code>spawn</code> (cria subagentes)</td>
+      </tr>
+      <tr>
+        <td><code>nanobot/agent/tools/cron.py</code></td>
+        <td>~110</td>
+        <td>Tool: <code>cron</code> (agenda tarefas)</td>
+      </tr>
+    </table>
+
+    <h3>Message Bus &mdash; O correio interno</h3>
+    <table>
+      <tr><th>Arquivo</th><th>Linhas</th><th>O que faz</th></tr>
+      <tr>
+        <td><code>nanobot/bus/queue.py</code></td>
+        <td>92</td>
+        <td>Fila de mensagens (<code>asyncio.Queue</code>, max 1000)</td>
+      </tr>
+      <tr>
+        <td><code>nanobot/bus/events.py</code></td>
+        <td>~50</td>
+        <td>Tipos de mensagem (<code>InboundMessage</code>, <code>OutboundMessage</code>)</td>
+      </tr>
+    </table>
+
+    <h3>Channels &mdash; As portas de entrada</h3>
+    <table>
+      <tr><th>Arquivo</th><th>Linhas</th><th>O que faz</th></tr>
+      <tr>
+        <td><code>nanobot/channels/base.py</code></td>
+        <td>~130</td>
+        <td>Classe base de todos os canais</td>
+      </tr>
+      <tr>
+        <td><code>nanobot/channels/telegram.py</code></td>
+        <td>400</td>
+        <td>Canal Telegram (polling + envio)</td>
+      </tr>
+      <tr>
+        <td><code>nanobot/channels/discord.py</code></td>
+        <td>~220</td>
+        <td>Canal Discord (WebSocket)</td>
+      </tr>
+      <tr>
+        <td><code>nanobot/channels/whatsapp.py</code></td>
+        <td>~150</td>
+        <td>Canal WhatsApp (bridge Node.js)</td>
+      </tr>
+      <tr>
+        <td><code>nanobot/channels/feishu.py</code></td>
+        <td>~270</td>
+        <td>Canal Feishu (WebSocket)</td>
+      </tr>
+      <tr>
+        <td><code>nanobot/channels/dingtalk.py</code></td>
+        <td>~100</td>
+        <td>Canal DingTalk (Stream)</td>
+      </tr>
+    </table>
+
+    <h3>Providers &mdash; Conexao com a IA</h3>
+    <table>
+      <tr><th>Arquivo</th><th>Linhas</th><th>O que faz</th></tr>
+      <tr>
+        <td><code>nanobot/providers/base.py</code></td>
+        <td>~60</td>
+        <td>Interface base do provider LLM</td>
+      </tr>
+      <tr>
+        <td><code>nanobot/providers/registry.py</code></td>
+        <td>~100</td>
+        <td>Registro de providers (auto-detect, prefixing)</td>
+      </tr>
+    </table>
+
+    <h3>Configuracao e Sessoes</h3>
+    <table>
+      <tr><th>Arquivo</th><th>Linhas</th><th>O que faz</th></tr>
+      <tr>
+        <td><code>nanobot/config/schema.py</code></td>
+        <td>~100</td>
+        <td>Schema de configuracao (Pydantic)</td>
+      </tr>
+      <tr>
+        <td><code>nanobot/session/manager.py</code></td>
+        <td>249</td>
+        <td>Gerencia sessoes (JSONL, cache LRU)</td>
+      </tr>
+    </table>
+
+    <h3>Seguranca</h3>
+    <table>
+      <tr><th>Arquivo</th><th>Linhas</th><th>O que faz</th></tr>
+      <tr>
+        <td><code>nanobot/security/ratelimit.py</code></td>
+        <td>~100</td>
+        <td>Rate limiter (token bucket por sessao)</td>
+      </tr>
+      <tr>
+        <td><code>nanobot/security/sanitize.py</code></td>
+        <td>~50</td>
+        <td>Sanitiza erros e resultados de tools</td>
+      </tr>
+      <tr>
+        <td><code>nanobot/security/validators.py</code></td>
+        <td>~70</td>
+        <td>Valida paths, filenames, inputs</td>
+      </tr>
+    </table>
+
+    <h3>Servicos</h3>
+    <table>
+      <tr><th>Arquivo</th><th>Linhas</th><th>O que faz</th></tr>
+      <tr>
+        <td><code>nanobot/cron/service.py</code></td>
+        <td>346</td>
+        <td>Servico de tarefas agendadas</td>
+      </tr>
+      <tr>
+        <td><code>nanobot/heartbeat/</code></td>
+        <td>~40</td>
+        <td>Heartbeat para wake-up proativo</td>
+      </tr>
+      <tr>
+        <td><code>nanobot/cli/commands.py</code></td>
+        <td>846</td>
+        <td>Todos os comandos CLI (gateway, agent, status, etc.)</td>
+      </tr>
+    </table>
+  </section>
+
+  <!-- =========================================================== -->
+  <!-- 2. LIMITES E PROTECOES                                      -->
+  <!-- =========================================================== -->
+  <section id="limites">
+    <h2><span class="num">2.</span> Limites e Protecoes</h2>
+    <p>O nanobot tem dezenas de limites espalhados pelo codigo. Cada um existe para evitar que o sistema trave, consuma memoria demais, ou seja abusado. Esta secao documenta <strong>todos</strong> eles.</p>
+
+    <h3>Fila de Mensagens (MessageBus)</h3>
+    <table>
+      <tr><th>Constante</th><th>Valor</th><th>Onde</th><th>O que acontece</th></tr>
+      <tr>
+        <td><code>MAX_QUEUE_SIZE</code></td>
+        <td><span class="badge badge-orange">1000</span></td>
+        <td><code>bus/queue.py</code></td>
+        <td>Tanto a fila de entrada quanto a de saida seguram no maximo 1000 mensagens</td>
+      </tr>
+      <tr>
+        <td>Timeout da fila</td>
+        <td><span class="badge badge-red">5 segundos</span></td>
+        <td><code>bus/queue.py</code></td>
+        <td>Se a fila nao tiver espaco em 5s, a mensagem e <strong>perdida</strong> com warning "backpressure"</td>
+      </tr>
+    </table>
+
+    <div class="card">
+      <h4>Importante: a fila e in-memory</h4>
+      <p>A fila do MessageBus e uma <code>asyncio.Queue</code> &mdash; ela existe <strong>apenas na memoria RAM</strong>. Se o processo morrer, tudo que esta na fila desaparece. Quando a fila enche (1000 mensagens), as novas sao <strong>descartadas</strong> (dropped), nao salvas. Nao ha persistencia.</p>
+      <p>A fila e o "corredor" entre channels e agent. Mensagens passam por ela rapidamente. Se estiver acumulando 1000, significa que o agent esta muito lento ou parado.</p>
+    </div>
+
+    <h3>Sessoes (Session)</h3>
+    <table>
+      <tr><th>Constante</th><th>Valor</th><th>Onde</th><th>O que acontece</th></tr>
+      <tr>
+        <td><code>MAX_MESSAGES_PER_SESSION</code></td>
+        <td><span class="badge badge-orange">1000</span></td>
+        <td><code>session/manager.py</code></td>
+        <td>Cada sessao guarda no maximo 1000 mensagens em memoria e disco. Quando excede, as mais antigas sao descartadas (mantem as ultimas 1000)</td>
+      </tr>
+      <tr>
+        <td><code>MAX_MESSAGE_SIZE</code></td>
+        <td><span class="badge badge-blue">100 KB</span></td>
+        <td><code>session/manager.py</code></td>
+        <td>Mensagens individuais maiores que 100KB sao truncadas</td>
+      </tr>
+      <tr>
+        <td><code>MAX_CACHED_SESSIONS</code></td>
+        <td><span class="badge badge-green">100</span></td>
+        <td><code>session/manager.py</code></td>
+        <td>So 100 sessoes ficam na RAM (cache LRU). As demais sao carregadas do disco sob demanda</td>
+      </tr>
+      <tr>
+        <td><code>SESSION_EXPIRY_DAYS</code></td>
+        <td><span class="badge badge-purple">30 dias</span></td>
+        <td><code>session/manager.py</code></td>
+        <td>Sessoes com mais de 30 dias sao deletadas no proximo acesso</td>
+      </tr>
+      <tr>
+        <td><code>get_history(max_messages=50)</code></td>
+        <td><span class="badge badge-blue">50</span></td>
+        <td><code>session/manager.py</code></td>
+        <td>Quando monta o contexto para o LLM, envia apenas as ultimas 50 mensagens (nao as 1000)</td>
+      </tr>
+    </table>
+
+    <div class="card">
+      <h4>Por que 1000 no disco mas so 50 para o LLM?</h4>
+      <p>O arquivo <code>.jsonl</code> guarda 1000 mensagens como <strong>backup completo</strong> da conversa. Mas o LLM recebe apenas as ultimas 50 porque: (a) modelos tem limite de tokens, (b) mensagens muito antigas raramente sao relevantes, e (c) menos mensagens = resposta mais rapida e mais barata.</p>
+    </div>
+
+    <h3>Fila vs. Sessao &mdash; A diferenca crucial</h3>
+    <p>Os dois tem limite de 1000, mas sao coisas completamente diferentes:</p>
+
+    <div class="comparison">
+      <div class="side queue-side">
+        <h4>Fila (MessageBus)</h4>
+        <ul>
+          <li><strong>Onde:</strong> Memoria RAM apenas</li>
+          <li><strong>O que guarda:</strong> Mensagens em transito (entrada e saida)</li>
+          <li><strong>Quando enche:</strong> Mensagens novas sao <strong>descartadas</strong> (perdidas pra sempre)</li>
+          <li><strong>Duracao:</strong> Segundos (mensagens passam rapido)</li>
+          <li><strong>Persistencia:</strong> Nenhuma &mdash; morre com o processo</li>
+          <li><strong>Analogia:</strong> Uma esteira rolante. Se nao cabe mais, cai no chao</li>
+        </ul>
+      </div>
+      <div class="side session-side">
+        <h4>Sessao (Session)</h4>
+        <ul>
+          <li><strong>Onde:</strong> Memoria RAM (cache) + disco (<code>.jsonl</code>)</li>
+          <li><strong>O que guarda:</strong> Historico completo de uma conversa</li>
+          <li><strong>Quando enche:</strong> As mensagens <strong>mais antigas</strong> sao removidas (mantem as 1000 mais recentes)</li>
+          <li><strong>Duracao:</strong> Ate 30 dias</li>
+          <li><strong>Persistencia:</strong> Arquivo no disco, escrita atomica</li>
+          <li><strong>Analogia:</strong> Um caderno. Quando enche, arranca as primeiras paginas</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="diagram">
+<pre><code>FILA (transito)                        SESSAO (historico)
+=================                      ==================
+
+Channel --&gt; [msg][msg][msg] --&gt; Agent   Arquivo .jsonl no disco:
+            ^^^^^^^^^^^^^^^^            +---------------------------+
+            Max 1000 in-memory          | msg 1  (mais antiga)      |  &larr; descartada
+            Se cheia: DROP              | msg 2                     |     quando &gt; 1000
+                                        | ...                       |
+Mensagem fica SEGUNDOS aqui.           | msg 999                   |
+Sem persistencia.                       | msg 1000 (mais recente)   |
+                                        +---------------------------+
+                                        Mensagem fica ATE 30 DIAS.</code></pre>
+    </div>
+
+    <h3>Rate Limiting (Token Bucket)</h3>
+    <table>
+      <tr><th>Operacao</th><th>Limite</th><th>Janela</th><th>Por</th></tr>
+      <tr>
+        <td><code>channel_message</code></td>
+        <td><span class="badge badge-orange">10</span></td>
+        <td>por minuto</td>
+        <td>sessao</td>
+      </tr>
+      <tr>
+        <td><code>tool_exec</code></td>
+        <td><span class="badge badge-orange">5</span></td>
+        <td>por minuto</td>
+        <td>sessao</td>
+      </tr>
+      <tr>
+        <td><code>web_fetch</code></td>
+        <td><span class="badge badge-blue">20</span></td>
+        <td>por minuto</td>
+        <td>sessao</td>
+      </tr>
+      <tr>
+        <td><code>file_write</code></td>
+        <td><span class="badge badge-blue">30</span></td>
+        <td>por minuto</td>
+        <td>sessao</td>
+      </tr>
+      <tr>
+        <td><code>subagent_spawn</code></td>
+        <td><span class="badge badge-red">3</span></td>
+        <td>a cada 5 minutos</td>
+        <td>sessao</td>
+      </tr>
+      <tr>
+        <td><code>cron_job</code></td>
+        <td><span class="badge badge-purple">10</span></td>
+        <td>por hora</td>
+        <td>sessao</td>
+      </tr>
+    </table>
+
+    <h3>Contexto e Arquivos</h3>
+    <table>
+      <tr><th>Constante</th><th>Valor</th><th>O que faz</th></tr>
+      <tr>
+        <td><code>MAX_BOOTSTRAP_FILE_SIZE</code></td>
+        <td><span class="badge badge-orange">500 KB</span></td>
+        <td>Bootstrap files (SOUL.md, AGENTS.md etc.) maiores que 500KB sao <strong>ignorados</strong></td>
+      </tr>
+      <tr>
+        <td><code>MAX_IMAGE_SIZE</code></td>
+        <td><span class="badge badge-blue">5 MB</span></td>
+        <td>Tamanho maximo por imagem enviada</td>
+      </tr>
+      <tr>
+        <td><code>MAX_IMAGES_PER_MESSAGE</code></td>
+        <td><span class="badge badge-blue">5</span></td>
+        <td>Maximo de imagens por mensagem</td>
+      </tr>
+      <tr>
+        <td><code>MAX_READ_SIZE</code></td>
+        <td><span class="badge badge-green">10 MB</span></td>
+        <td>Tamanho maximo que o tool <code>read_file</code> consegue ler</td>
+      </tr>
+      <tr>
+        <td><code>MAX_WRITE_SIZE</code></td>
+        <td><span class="badge badge-green">10 MB</span></td>
+        <td>Tamanho maximo que o tool <code>write_file</code> consegue gravar</td>
+      </tr>
+      <tr>
+        <td>Saida do shell</td>
+        <td><span class="badge badge-orange">10.000 chars</span></td>
+        <td>Saida do tool <code>exec</code> e truncada em 10.000 caracteres</td>
+      </tr>
+    </table>
+
+    <h3>Outros Limites</h3>
+    <table>
+      <tr><th>Constante</th><th>Valor</th><th>O que faz</th></tr>
+      <tr>
+        <td><code>MAX_CONCURRENT_SUBAGENTS</code></td>
+        <td><span class="badge badge-red">5</span></td>
+        <td>Maximo de subagentes rodando ao mesmo tempo</td>
+      </tr>
+      <tr>
+        <td><code>MAX_REDIRECTS</code></td>
+        <td><span class="badge badge-blue">5</span></td>
+        <td>Maximo de redirecionamentos HTTP no <code>web_fetch</code></td>
+      </tr>
+      <tr>
+        <td><code>MAX_ATTACHMENT_BYTES</code></td>
+        <td><span class="badge badge-orange">20 MB</span></td>
+        <td>Tamanho maximo de anexo no Discord</td>
+      </tr>
+      <tr>
+        <td>Channel message size</td>
+        <td><span class="badge badge-blue">50 KB</span></td>
+        <td>Tamanho maximo de mensagem no canal base</td>
+      </tr>
+      <tr>
+        <td>Feishu dedup cache</td>
+        <td><span class="badge badge-purple">1000 &rarr; 500</span></td>
+        <td>Cache de deduplicacao do Feishu: quando atinge 1000 entradas, faz trim para 500</td>
+      </tr>
+    </table>
+  </section>
+
+  <!-- =========================================================== -->
+  <!-- 3. RATE LIMITING EXPLICADO                                  -->
+  <!-- =========================================================== -->
+  <section id="rate-limiting">
+    <h2><span class="num">3.</span> Rate Limiting Explicado</h2>
+    <p>O sistema de rate limiting do nanobot usa o algoritmo <strong>Token Bucket</strong> (balde de fichas). Cada tipo de operacao tem seu proprio balde, e cada sessao (usuario) tem seus proprios baldes independentes.</p>
+
+    <h3>Como funciona o Token Bucket</h3>
+
+    <div class="analogy">
+      <h4>Analogia: tanque de agua</h4>
+      <p>Imagine um tanque de agua que enche lentamente por uma torneira. Cada vez que voce quer fazer uma operacao (mandar mensagem, executar tool, etc.), voce precisa tirar 1 litro do tanque.</p>
+      <p>Se o tanque estiver <strong>vazio</strong>, voce nao pode fazer nada &mdash; tem que esperar a torneira encher mais um pouco.</p>
+      <p>O tanque tem um tamanho maximo (capacidade). Mesmo que voce nao use, ele nao transborda &mdash; a torneira para quando ta cheio.</p>
+      <p>Isso permite <strong>rajadas curtas</strong> (usar varios litros de uma vez) mas impede <strong>abuso continuo</strong> (a torneira nao enche rapido o suficiente).</p>
+    </div>
+
+    <h3>Mecanica passo a passo</h3>
+    <ol>
+      <li>Cada tipo de operacao tem um <strong>balde</strong> com capacidade fixa (exemplo: <code>channel_message</code> = 10)</li>
+      <li>O balde comeca <strong>cheio</strong> (10 fichas disponiveis)</li>
+      <li>Cada request consome <strong>1 ficha</strong></li>
+      <li>Fichas sao reabastecidas ao longo do tempo (exemplo: 10 fichas por minuto = 1 ficha a cada 6 segundos)</li>
+      <li>Se o balde esta vazio, o request e <strong>negado</strong> (nao enfileirado, negado imediatamente)</li>
+      <li>Cada sessao tem seus proprios baldes &mdash; o abuso de um usuario nao afeta os outros</li>
+    </ol>
+
+    <h3>Exemplo pratico</h3>
+<pre><code>Operacao: channel_message (10/minuto)
+Tempo: 00:00  Balde: [10 fichas]
+
+00:01  Usuario manda msg   &rarr; consome 1  &rarr; Balde: [9]   OK
+00:02  Usuario manda msg   &rarr; consome 1  &rarr; Balde: [8]   OK
+00:03  Usuario manda msg   &rarr; consome 1  &rarr; Balde: [7]   OK
+...
+00:10  Usuario manda msg   &rarr; consome 1  &rarr; Balde: [0]   OK
+00:11  Usuario manda msg   &rarr; balde vazio &rarr;              NEGADO
+00:12  (6s se passaram)    &rarr; +1 ficha   &rarr; Balde: [1]
+00:12  Usuario manda msg   &rarr; consome 1  &rarr; Balde: [0]   OK</code></pre>
+
+    <h3>Por que Token Bucket e nao uma janela simples?</h3>
+    <div class="card">
+      <h4>Vantagem do Token Bucket</h4>
+      <p>Com uma janela fixa (ex: "10 por minuto"), um usuario pode mandar 10 mensagens no segundo 59 e mais 10 no segundo 61 &mdash; totalizando 20 em 2 segundos. O Token Bucket evita isso porque as fichas gastam e demoram para reabastecer, distribuindo o uso de forma <strong>mais uniforme</strong> ao longo do tempo.</p>
+    </div>
+
+    <h3>Todos os baldes configurados</h3>
+    <table>
+      <tr><th>Operacao</th><th>Capacidade</th><th>Reabastecimento</th><th>Descricao</th></tr>
+      <tr>
+        <td><code>channel_message</code></td>
+        <td>10</td>
+        <td>10 por minuto</td>
+        <td>Mensagens recebidas de um usuario em um canal</td>
+      </tr>
+      <tr>
+        <td><code>tool_exec</code></td>
+        <td>5</td>
+        <td>5 por minuto</td>
+        <td>Execucoes de comandos no terminal</td>
+      </tr>
+      <tr>
+        <td><code>web_fetch</code></td>
+        <td>20</td>
+        <td>20 por minuto</td>
+        <td>Requisicoes HTTP feitas pelo agente</td>
+      </tr>
+      <tr>
+        <td><code>file_write</code></td>
+        <td>30</td>
+        <td>30 por minuto</td>
+        <td>Escritas em arquivo</td>
+      </tr>
+      <tr>
+        <td><code>subagent_spawn</code></td>
+        <td>3</td>
+        <td>3 a cada 5 minutos</td>
+        <td>Criacao de subagentes em background</td>
+      </tr>
+      <tr>
+        <td><code>cron_job</code></td>
+        <td>10</td>
+        <td>10 por hora</td>
+        <td>Execucoes de tarefas agendadas</td>
+      </tr>
+    </table>
+
+    <h3>O que acontece quando negado?</h3>
+    <p>Quando o rate limit nega uma operacao:</p>
+    <ul>
+      <li>Para <strong>mensagens de channel</strong>: a mensagem e silenciosamente ignorada. O usuario nao recebe aviso.</li>
+      <li>Para <strong>tools</strong>: o resultado retornado ao LLM e uma mensagem de erro informando o rate limit. O LLM pode decidir esperar ou tentar outra abordagem.</li>
+      <li>Para <strong>subagents</strong>: a tentativa de spawn falha e o agente e informado.</li>
+    </ul>
+  </section>
+
+  <!-- =========================================================== -->
+  <!-- 4. CICLO DE VIDA DE UMA MENSAGEM                            -->
+  <!-- =========================================================== -->
+  <section id="ciclo-vida">
+    <h2><span class="num">4.</span> Ciclo de Vida de uma Mensagem</h2>
+    <p>Passo a passo completo do que acontece desde o usuario digitar no Telegram ate receber a resposta, com <strong>todos os limites</strong> que se aplicam em cada etapa.</p>
+
+    <div class="flow">
+      <div class="flow-step" data-step="1">
+        <span class="label">Usuario envia mensagem no Telegram</span>
+        <span class="desc">O usuario digita "Qual o clima em SP?" e aperta enviar. A mensagem vai para os servidores do Telegram.</span>
+      </div>
+
+      <div class="flow-step" data-step="2">
+        <span class="label">Channel Telegram recebe</span>
+        <span class="desc">O polling do <code>TelegramChannel</code> detecta a mensagem nova. Primeira verificacao: o <code>sender_id</code> esta na lista <code>allowFrom</code>? Se nao, a mensagem e <strong>ignorada silenciosamente</strong>.</span>
+        <span class="limit-tag">allowFrom: whitelist de IDs</span>
+      </div>
+
+      <div class="flow-step" data-step="3">
+        <span class="label">Rate limit do channel</span>
+        <span class="desc">Verifica se este usuario ja mandou muitas mensagens. O token bucket <code>channel_message</code> consome 1 ficha. Se o balde estiver vazio, a mensagem e descartada.</span>
+        <span class="limit-tag">channel_message: 10/minuto por sessao</span>
+      </div>
+
+      <div class="flow-step" data-step="4">
+        <span class="label">Cria InboundMessage e enfileira</span>
+        <span class="desc">O channel cria um <code>InboundMessage</code> padronizado e coloca na fila de entrada do MessageBus. A fila aceita no maximo 1000 mensagens. Se estiver cheia, espera ate 5 segundos. Se nao abrir espaco, a mensagem e <strong>perdida</strong> com warning de backpressure.</span>
+        <span class="limit-tag">MAX_QUEUE_SIZE: 1000 | Timeout: 5s</span>
+      </div>
+
+      <div class="flow-step" data-step="5">
+        <span class="label">Agent loop consome da fila</span>
+        <span class="desc">O <code>AgentLoop</code> esta em <code>await bus.consume_inbound()</code> e recebe a mensagem. Carrega a sessao correspondente (<code>telegram:123456789</code>). Se a sessao nao esta no cache LRU, carrega do disco. Se tem mais de 30 dias, deleta e cria nova.</span>
+        <span class="limit-tag">MAX_CACHED_SESSIONS: 100 | SESSION_EXPIRY: 30 dias</span>
+      </div>
+
+      <div class="flow-step" data-step="6">
+        <span class="label">Context builder monta o prompt</span>
+        <span class="desc">O <code>ContextBuilder</code> monta o sistema de prompt na ordem: identidade &rarr; bootstrap files (SOUL.md, AGENTS.md, USER.md, TOOLS.md, IDENTITY.md) &rarr; memoria &rarr; skills &rarr; ultimas 50 mensagens do historico &rarr; mensagem atual. Bootstrap files maiores que 500KB sao ignorados.</span>
+        <span class="limit-tag">get_history: 50 msgs | MAX_BOOTSTRAP: 500KB</span>
+      </div>
+
+      <div class="flow-step" data-step="7">
+        <span class="label">Envia para o LLM provider</span>
+        <span class="desc">O <code>provider.chat()</code> envia todo o contexto montado para a API do modelo (ex: OpenRouter &rarr; Qwen). Junto vai a lista de tools disponiveis no formato JSON Schema. O LLM processa e retorna uma resposta.</span>
+      </div>
+
+      <div class="flow-step" data-step="8">
+        <span class="label">LLM pede tool call (se necessario)</span>
+        <span class="desc">Se o LLM decidir usar uma ferramenta (ex: <code>web_fetch("wttr.in/SP")</code>), o agent verifica o rate limit da tool. Se aprovado, executa. O resultado (ex: "28C, parcialmente nublado") e adicionado ao contexto e o loop volta ao passo 7. Isso pode repetir ate 20 vezes numa unica mensagem.</span>
+        <span class="limit-tag">tool_exec: 5/min | web_fetch: 20/min | file_write: 30/min | Max 20 iteracoes</span>
+      </div>
+
+      <div class="flow-step" data-step="9">
+        <span class="label">LLM responde com texto final</span>
+        <span class="desc">Quando o LLM responde com texto (sem tool calls), o loop sai. A resposta e encapsulada em um <code>OutboundMessage</code> e colocada na fila de saida do MessageBus. Mesmas regras: max 1000, timeout 5s.</span>
+        <span class="limit-tag">MAX_QUEUE_SIZE: 1000 | Timeout: 5s</span>
+      </div>
+
+      <div class="flow-step" data-step="10">
+        <span class="label">Dispatcher envia ao channel correto</span>
+        <span class="desc">O dispatcher retira da fila de saida e envia para o <code>TelegramChannel</code>. O channel converte para o formato do Telegram (HTML) e envia via API. A mensagem do channel tem limite de tamanho (50KB base).</span>
+        <span class="limit-tag">Channel message size: 50KB</span>
+      </div>
+
+      <div class="flow-step" data-step="11">
+        <span class="label">Sessao salva no disco</span>
+        <span class="desc">A mensagem do usuario + resposta do agente sao salvos no arquivo <code>.jsonl</code> da sessao. Se a sessao exceder 1000 mensagens, as mais antigas sao descartadas. A escrita e atomica (temp + rename) para evitar corrupcao.</span>
+        <span class="limit-tag">MAX_MESSAGES_PER_SESSION: 1000 | MAX_MESSAGE_SIZE: 100KB</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h4>Resumo dos limites no caminho</h4>
+      <table>
+        <tr><th>Etapa</th><th>Limite</th><th>Se exceder</th></tr>
+        <tr><td>Channel recebe</td><td><code>allowFrom</code></td><td>Mensagem ignorada</td></tr>
+        <tr><td>Channel rate limit</td><td>10/min</td><td>Mensagem descartada</td></tr>
+        <tr><td>Fila de entrada</td><td>1000 (5s timeout)</td><td>Mensagem perdida</td></tr>
+        <tr><td>Cache de sessoes</td><td>100 LRU</td><td>Sessao carregada do disco (mais lento)</td></tr>
+        <tr><td>Expiracao da sessao</td><td>30 dias</td><td>Sessao deletada, nova criada</td></tr>
+        <tr><td>Historico para LLM</td><td>50 mensagens</td><td>Mensagens antigas cortadas</td></tr>
+        <tr><td>Bootstrap files</td><td>500KB cada</td><td>Arquivo ignorado</td></tr>
+        <tr><td>Tool rate limits</td><td>Varia (5-30/min)</td><td>Tool retorna erro ao LLM</td></tr>
+        <tr><td>Iteracoes do loop</td><td>20</td><td>Responde com o que tem</td></tr>
+        <tr><td>Fila de saida</td><td>1000 (5s timeout)</td><td>Resposta perdida</td></tr>
+        <tr><td>Mensagem do channel</td><td>50KB</td><td>Mensagem truncada</td></tr>
+        <tr><td>Sessao no disco</td><td>1000 mensagens</td><td>Mais antigas removidas</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- =========================================================== -->
+  <!-- 4.5 FILA UNICA E PROCESSAMENTO SEQUENCIAL                   -->
+  <!-- =========================================================== -->
+  <section id="fila-processamento">
+    <h2><span class="num">5.</span> Fila Unica e Concorrencia</h2>
+    <p>Duas perguntas frequentes sobre a arquitetura do nanobot: como funciona quando os dados chegam por mais de um canal ao mesmo tempo? E o agente pode processar varias mensagens em paralelo?</p>
+
+    <div class="card">
+      <h4>A fila e unica para todos os canais</h4>
+      <p>Nao importa se a mensagem veio do Telegram, Discord, WhatsApp ou Feishu &mdash; todas vao para a <strong>mesma fila</strong> (<code>inbound</code>). O <code>MessageBus</code> tem exatamente duas filas:</p>
+      <table>
+        <tr><th>Fila</th><th>Direcao</th><th>Quem coloca</th><th>Quem retira</th></tr>
+        <tr><td><code>inbound</code></td><td>Canal &rarr; Agente</td><td>Todos os canais (Telegram, Discord, etc.)</td><td>AgentLoop (1 consumidor)</td></tr>
+        <tr><td><code>outbound</code></td><td>Agente &rarr; Canal</td><td>AgentLoop</td><td>Dispatcher (envia para o canal correto)</td></tr>
+      </table>
+      <p style="margin-top: 1rem;">Funciona como um <strong>funil</strong>: varios canais despejam mensagens na mesma entrada, e o agente puxa uma por uma.</p>
+    </div>
+
+    <div class="diagram">
+<pre><code>
+  Telegram ──┐
+             │
+  Discord ───┤       ┌─────────────────────┐        ┌───────────┐
+             ├──────►│  FILA INBOUND (1000) │───────►│ AgentLoop │
+  WhatsApp ──┤       └─────────────────────┘        │ (1 por vez)│
+             │                                       └─────┬─────┘
+  Feishu ────┘                                             │
+                                                           ▼
+  Telegram ◄──┐       ┌──────────────────────┐      ┌─────┴─────┐
+              ├──────│  FILA OUTBOUND (1000) │◄─────│ Resposta  │
+  Discord ◄───┘       └──────────────────────┘      └───────────┘
+  (dispatcher envia para o canal certo)
+</code></pre>
+    </div>
+
+    <div class="card">
+      <h4>O processamento e sequencial (uma mensagem por vez)</h4>
+      <p>O <code>AgentLoop</code> funciona com um loop simples:</p>
+<pre><code>while self._running:
+    msg = await bus.consume_inbound()       # 1. Pega UMA mensagem da fila
+    response = await _process_message(msg)  # 2. Processa ATE O FIM (inclui tools)
+    await bus.publish_outbound(response)    # 3. Coloca resposta na fila de saida
+    # so agora volta ao passo 1</code></pre>
+      <p style="margin-top: 1rem;">Enquanto o agente esta processando a mensagem A (chamando LLM, executando tools, esperando APIs), as mensagens B, C e D ficam <strong>esperando na fila</strong>. Nao ha processamento paralelo de mensagens.</p>
+    </div>
+
+    <div class="card">
+      <h4>Consequencias praticas</h4>
+      <table>
+        <tr><th>Situacao</th><th>O que acontece</th></tr>
+        <tr>
+          <td>Voce manda 3 mensagens rapidas pelo Telegram</td>
+          <td>A 1a e processada imediatamente. A 2a e 3a ficam na fila. Quando a 1a terminar, o agente pega a 2a, e depois a 3a. Voce recebe 3 respostas, em ordem.</td>
+        </tr>
+        <tr>
+          <td>Voce manda pelo Telegram e outra pessoa manda pelo Discord ao mesmo tempo</td>
+          <td>Ambas entram na mesma fila. A que chegar primeiro e processada primeiro. A outra espera. Nao ha prioridade por canal.</td>
+        </tr>
+        <tr>
+          <td>O agente esta usando tools (web_fetch, exec) que demoram</td>
+          <td>Tudo faz parte do processamento da mensagem. As tools rodam <strong>dentro</strong> do <code>_process_message()</code>. Novas mensagens continuam esperando na fila.</td>
+        </tr>
+        <tr>
+          <td>O agente usa <code>spawn</code> para criar subagente</td>
+          <td>O subagente roda em <strong>background</strong> (asyncio task separada). O agente pode terminar a mensagem atual e pegar a proxima. Quando o subagente termina, envia o resultado como mensagem "system" na fila.</td>
+        </tr>
+        <tr>
+          <td>100 pessoas mandam mensagens ao mesmo tempo</td>
+          <td>Todas entram na fila (cabe 1000). Sao processadas uma por uma, na ordem de chegada. As ultimas vao esperar bastante. Se a fila encher (1000), novas mensagens sao <strong>descartadas</strong>.</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h4>Por que nao e paralelo?</h4>
+      <p>O nanobot e um <strong>assistente pessoal</strong>, projetado para poucos usuarios (normalmente so voce). Processamento paralelo traria complexidade desnecessaria:</p>
+      <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
+        <li>Cada sessao compartilha o mesmo workspace &mdash; tools paralelos poderiam conflitar (dois escrevendo no mesmo arquivo)</li>
+        <li>O contexto do LLM depende do historico &mdash; processar em paralelo poderia misturar conversas</li>
+        <li>O rate limiter e por sessao &mdash; concorrencia exigiria locks extras</li>
+        <li>Para 1-5 usuarios, a fila sequencial funciona bem. Cada mensagem leva segundos, nao minutos</li>
+      </ul>
+      <p style="margin-top: 1rem;">A unica forma de paralelismo real e o <strong>subagente</strong> (<code>spawn</code>), que roda em background com seu proprio loop de tools (max 5 simultaneos).</p>
+    </div>
+  </section>
+
+  <!-- =========================================================== -->
+  <!-- 6. SEGURANCA EM CAMADAS                                     -->
+  <!-- =========================================================== -->
+  <section id="seguranca">
+    <h2><span class="num">6.</span> Seguranca em Camadas</h2>
+    <p>A seguranca do nanobot segue o principio de <strong>defesa em profundidade</strong> (defense in depth): multiplas camadas independentes, cada uma capaz de bloquear ameacas por conta propria. Se uma camada falhar, as proximas ainda protegem.</p>
+
+    <div class="diagram">
+<pre><code>+-------------------------------------------------------+
+|                    CAMADA 1: allowFrom                 |
+|              (whitelist de usuarios)                   |
++-------------------------------------------------------+
+                          |
++-------------------------------------------------------+
+|                  CAMADA 2: Rate Limiting               |
+|           (token bucket por sessao)                    |
++-------------------------------------------------------+
+                          |
++-------------------------------------------------------+
+|              CAMADA 3: Restricao de Workspace          |
+|       (tools so acessam ~/.nanobot/workspace/)         |
++-------------------------------------------------------+
+                          |
++-------------------------------------------------------+
+|              CAMADA 4: Validacao de Input               |
+|        (paths, filenames, tamanhos, comandos)          |
++-------------------------------------------------------+
+                          |
++-------------------------------------------------------+
+|              CAMADA 5: Sanitizacao de Output            |
+|        (erros, resultados de tools, stack traces)      |
++-------------------------------------------------------+
+                          |
++-------------------------------------------------------+
+|              CAMADA 6: Limites de Tamanho              |
+|     (mensagens, arquivos, filas, sessoes)              |
++-------------------------------------------------------+
+                          |
++-------------------------------------------------------+
+|              CAMADA 7: Isolamento (Docker)             |
+|         (non-root, rede restrita, volumes)             |
++-------------------------------------------------------+</code></pre>
+    </div>
+
+    <h3>Camada 1: allowFrom (Whitelist de Usuarios)</h3>
+    <div class="layer">
+      <h4>O que faz</h4>
+      <p>Cada channel tem uma lista <code>allowFrom</code> que define quais user IDs podem interagir com o bot. Se a lista estiver vazia, <strong>ninguem</strong> e aceito (deny all por padrao).</p>
+<pre><code>{
+  "channels": {
+    "telegram": {
+      "token": "...",
+      "allowFrom": ["123456789", "987654321"]
+    }
+  }
+}</code></pre>
+      <p>Mensagens de IDs fora da lista sao descartadas silenciosamente &mdash; sem resposta, sem log detalhado, sem confirmacao.</p>
+    </div>
+
+    <h3>Camada 2: Rate Limiting</h3>
+    <div class="layer">
+      <h4>O que faz</h4>
+      <p>Token bucket por sessao, impedindo abuso mesmo de usuarios autorizados. Cada operacao tem um balde independente. Veja a <a href="#rate-limiting">secao 3</a> para detalhes completos.</p>
+      <ul>
+        <li><code>channel_message</code>: 10/min</li>
+        <li><code>tool_exec</code>: 5/min</li>
+        <li><code>web_fetch</code>: 20/min</li>
+        <li><code>file_write</code>: 30/min</li>
+        <li><code>subagent_spawn</code>: 3/5min</li>
+        <li><code>cron_job</code>: 10/hora</li>
+      </ul>
+    </div>
+
+    <h3>Camada 3: Restricao de Workspace</h3>
+    <div class="layer">
+      <h4>O que faz</h4>
+      <p>Quando <code>restrictToWorkspace</code> esta ativo (padrao), todos os tools de filesystem (<code>read_file</code>, <code>write_file</code>, <code>edit_file</code>, <code>list_dir</code>) so podem acessar arquivos dentro de <code>~/.nanobot/workspace/</code>. Tentativas de acessar <code>/etc/passwd</code>, <code>~/.ssh/</code>, ou qualquer coisa fora do workspace sao <strong>bloqueadas</strong>.</p>
+      <p>O tool <code>exec</code> tambem roda com o diretorio de trabalho setado para o workspace.</p>
+    </div>
+
+    <h3>Camada 4: Validacao de Input</h3>
+    <div class="layer">
+      <h4>O que faz</h4>
+      <p>O modulo <code>security/validators.py</code> valida:</p>
+      <ul>
+        <li><strong>Paths</strong>: bloqueia path traversal (<code>../../etc/passwd</code>), symlinks maliciosos, paths absolutos fora do workspace</li>
+        <li><strong>Filenames</strong>: bloqueia caracteres especiais, nomes reservados do sistema, nomes muito longos</li>
+        <li><strong>Comandos shell</strong>: bloqueia padroes perigosos (<code>rm -rf /</code>, <code>dd if=</code>, fork bombs <code>:(){ :|:</code>, <code>mkfs</code>, <code>&gt; /dev/</code>) e detecta injecao de comandos (<code>;</code>, <code>&amp;&amp;</code>, <code>||</code>, <code>|</code>, backticks, <code>$()</code>)</li>
+        <li><strong>Tamanhos</strong>: verifica limites de mensagens (100KB), arquivos (10MB), imagens (5MB)</li>
+      </ul>
+    </div>
+
+    <h3>Camada 5: Sanitizacao de Output</h3>
+    <div class="layer">
+      <h4>O que faz</h4>
+      <p>O modulo <code>security/sanitize.py</code> limpa resultados antes de enviá-los de volta:</p>
+      <ul>
+        <li><strong>Erros</strong>: stack traces completos sao removidos e substituidos por mensagens genericas (nao vaza paths internos, nomes de modulos, etc.)</li>
+        <li><strong>Resultados de tools</strong>: saida de shell truncada em 10.000 caracteres</li>
+        <li><strong>Informacoes sensiveis</strong>: tokens, keys e passwords sao filtrados dos resultados</li>
+      </ul>
+    </div>
+
+    <h3>Camada 6: Limites de Tamanho</h3>
+    <div class="layer">
+      <h4>O que faz</h4>
+      <p>Limites em todas as "bordas" do sistema para evitar abuso de recursos:</p>
+      <ul>
+        <li>Fila: 1000 mensagens max (RAM)</li>
+        <li>Sessao: 1000 mensagens max (disco)</li>
+        <li>Mensagem individual: 100KB</li>
+        <li>Mensagem do channel: 50KB</li>
+        <li>Arquivo read/write: 10MB</li>
+        <li>Bootstrap file: 500KB</li>
+        <li>Imagem: 5MB, max 5 por mensagem</li>
+        <li>Anexo Discord: 20MB</li>
+        <li>Saida shell: 10.000 chars</li>
+      </ul>
+    </div>
+
+    <h3>Camada 7: Isolamento Docker</h3>
+    <div class="layer">
+      <h4>O que faz</h4>
+      <p>Quando rodando em Docker (recomendado para producao):</p>
+      <ul>
+        <li><strong>Non-root</strong>: o container roda com um usuario sem privilegios</li>
+        <li><strong>Volumes restritos</strong>: apenas <code>~/.nanobot/</code> e montado</li>
+        <li><strong>Sem capabilities extras</strong>: nao tem acesso ao host</li>
+        <li><strong>Rede controlada</strong>: so precisa de acesso HTTPS de saida (APIs de LLM e channels)</li>
+      </ul>
+    </div>
+
+    <h3>Escrita atomica de arquivos</h3>
+    <div class="card">
+      <h4>Como funciona a escrita atomica</h4>
+      <p>Para evitar corrupcao de dados (ex: queda de energia no meio de uma escrita), o nanobot usa o padrao <strong>temp + rename</strong>:</p>
+<pre><code>1. Escreve o conteudo em um arquivo temporario (.tmp)
+2. Faz fsync() para garantir que esta no disco
+3. Renomeia o .tmp para o arquivo final (operacao atomica no filesystem)
+
+Se der erro no passo 1 ou 2, o arquivo original nao e afetado.
+O rename (passo 3) e atomico no Linux/macOS &mdash; ou o arquivo
+antigo existe ou o novo, nunca um estado intermediario.</code></pre>
+      <p>Isso e usado em: sessoes (<code>.jsonl</code>), config, cron jobs, e qualquer escrita do tool <code>write_file</code>.</p>
+    </div>
+  </section>
+
+  <!-- =========================================================== -->
+  <!-- 6. ARMAZENAMENTO                                            -->
+  <!-- =========================================================== -->
+  <section id="armazenamento">
+    <h2><span class="num">7.</span> Armazenamento</h2>
+    <p>Todo o estado do nanobot vive dentro de <code>~/.nanobot/</code>. Nao usa banco de dados, nao usa Redis, nao usa nada externo. Apenas arquivos no disco.</p>
+
+    <h3>Estrutura de diretorios</h3>
+    <div class="diagram">
+<pre><code>~/.nanobot/
++-- config.json                    &larr; Configuracao principal
++-- gateway.log                    &larr; Log do gateway
++-- sessions/                      &larr; Historico de conversas
+|   +-- telegram_123456789.jsonl
+|   +-- discord_987654321.jsonl
+|   +-- whatsapp_5511999998888.jsonl
++-- workspace/                     &larr; Area de trabalho do agente
+|   +-- SOUL.md                    &larr; Personalidade do agente
+|   +-- AGENTS.md                  &larr; Instrucoes para agentes
+|   +-- USER.md                    &larr; Informacoes sobre o usuario
+|   +-- TOOLS.md                   &larr; Config de ferramentas
+|   +-- IDENTITY.md                &larr; Identidade do agente
+|   +-- memory/
+|   |   +-- MEMORY.md              &larr; Memoria permanente
+|   |   +-- 2026-02-10.md          &larr; Notas diarias
+|   +-- ... (outros arquivos)
++-- cron/                          &larr; Tarefas agendadas
+|   +-- jobs.json
++-- skills/                        &larr; Skills instalados
+    +-- remotion/
+    |   +-- SKILL.md
+    +-- github/
+        +-- SKILL.md</code></pre>
+    </div>
+
+    <h3>Detalhes de cada tipo de armazenamento</h3>
+
+    <h4>Sessoes (<code>~/.nanobot/sessions/*.jsonl</code>)</h4>
+    <div class="card">
+      <h4>Formato JSONL</h4>
+      <p>Cada arquivo de sessao usa o formato <strong>JSONL</strong> (JSON Lines) &mdash; uma linha JSON por mensagem. Isso permite append eficiente (adicionar sem reescrever o arquivo todo) e leitura linha por linha (sem carregar tudo na memoria).</p>
+<pre><code>{"_type":"metadata","created_at":"2026-02-10T05:30:00","session_key":"telegram:123456789"}
+{"role":"user","content":"Oi!","timestamp":"2026-02-10T05:31:00"}
+{"role":"assistant","content":"Ola! Como posso ajudar?","timestamp":"2026-02-10T05:31:05"}
+{"role":"user","content":"Qual o clima em SP?","timestamp":"2026-02-10T05:32:00"}
+{"role":"assistant","content":"28C, parcialmente nublado","timestamp":"2026-02-10T05:32:15"}</code></pre>
+      <ul>
+        <li>Max 1000 mensagens por arquivo</li>
+        <li>Max 100KB por mensagem individual</li>
+        <li>Escrita atomica (temp + rename)</li>
+        <li>Auto-deletado apos 30 dias sem acesso</li>
+        <li>100 sessoes em cache LRU na memoria</li>
+      </ul>
+    </div>
+
+    <h4>Configuracao (<code>~/.nanobot/config.json</code>)</h4>
+    <div class="card">
+      <h4>Schema Pydantic</h4>
+      <p>O arquivo de configuracao e validado pelo Pydantic v2 (<code>config/schema.py</code>). Se tiver campo errado, tipo errado, ou valor invalido, o nanobot recusa iniciar e mostra o erro exato.</p>
+<pre><code>{
+  "model": "openrouter/qwen/qwen3-coder-next",
+  "channels": {
+    "telegram": {
+      "token": "BOT_TOKEN_AQUI",
+      "allowFrom": ["123456789"]
+    }
+  },
+  "restrictToWorkspace": true
+}</code></pre>
+    </div>
+
+    <h4>Workspace (<code>~/.nanobot/workspace/</code>)</h4>
+    <div class="card">
+      <h4>Arquivos de bootstrap</h4>
+      <p>Os arquivos na raiz do workspace sao os "bootstrap files" &mdash; carregados automaticamente no contexto do agente a cada mensagem. Sao eles que definem a personalidade, conhecimento e comportamento:</p>
+      <table>
+        <tr><th>Arquivo</th><th>Proposito</th></tr>
+        <tr><td><code>SOUL.md</code></td><td>Personalidade principal, tom de voz, regras de comportamento</td></tr>
+        <tr><td><code>AGENTS.md</code></td><td>Instrucoes especificas para agentes de IA</td></tr>
+        <tr><td><code>USER.md</code></td><td>Informacoes sobre o usuario (nome, preferencias, contexto)</td></tr>
+        <tr><td><code>TOOLS.md</code></td><td>Configuracao e restricoes de ferramentas</td></tr>
+        <tr><td><code>IDENTITY.md</code></td><td>Nome e identidade visual do agente</td></tr>
+      </table>
+      <p>Limite: cada arquivo de bootstrap tem max <strong>500KB</strong>. Arquivos maiores sao ignorados.</p>
+    </div>
+
+    <h4>Cron (<code>~/.nanobot/cron/</code>)</h4>
+    <div class="card">
+      <h4>Tarefas agendadas</h4>
+      <p>Os jobs do cron sao salvos em <code>jobs.json</code> e persistidos no disco. O servico de cron (<code>cron/service.py</code>, 346 linhas) verifica a cada 10-30 segundos se ha tarefas para executar. Suporta tres tipos: <code>every</code> (intervalo), <code>cron</code> (expressao cron), e <code>at</code> (data/hora unica).</p>
+    </div>
+
+    <h4>Log do gateway (<code>~/.nanobot/gateway.log</code>)</h4>
+    <div class="card">
+      <h4>Log de operacao</h4>
+      <p>Registra eventos do gateway: startup, shutdown, erros de channels, erros de provider, rate limits ativados, etc. Util para debug. Nao tem rotacao automatica &mdash; o usuario precisa gerenciar o tamanho.</p>
+    </div>
+
+    <h4>Memoria (<code>~/.nanobot/workspace/memory/</code>)</h4>
+    <div class="card">
+      <h4>Memoria persistente do agente</h4>
+      <p>O agente pode gravar informacoes que quer lembrar entre sessoes:</p>
+      <ul>
+        <li><code>MEMORY.md</code> &mdash; Memoria permanente. O agente pode ler e editar livremente. Ideal para informacoes que nunca mudam (nome do usuario, preferencias, etc.)</li>
+        <li><code>YYYY-MM-DD.md</code> &mdash; Notas diarias. O contexto builder inclui automaticamente as notas dos ultimos 7 dias. Ideal para anotacoes temporarias, TODOs, lembretes.</li>
+      </ul>
+      <p>O agente acessa a memoria via tools (<code>read_file</code>, <code>write_file</code>). Na proxima conversa, o context builder carrega a memoria automaticamente no prompt do sistema.</p>
+    </div>
+
+    <h3>Nada de banco de dados</h3>
+    <div class="card">
+      <h4>Por que so arquivos?</h4>
+      <p>O nanobot e um assistente <strong>pessoal</strong>, nao um servidor de producao com milhares de usuarios. Para um unico usuario (ou um punhado), arquivos no disco sao:</p>
+      <ul>
+        <li><strong>Simples</strong>: nao precisa instalar/configurar nada</li>
+        <li><strong>Transparentes</strong>: voce pode abrir e ler qualquer arquivo num editor de texto</li>
+        <li><strong>Portaveis</strong>: copiar <code>~/.nanobot/</code> para outra maquina e voce tem tudo</li>
+        <li><strong>Confiaveis</strong>: escrita atomica previne corrupcao</li>
+        <li><strong>Leves</strong>: sem dependencia externa, sem processo separado</li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+<a href="#" class="back-top" id="backTop" title="Voltar ao topo">&uarr;</a>
+
+<footer>
+  <p>nanobot &mdash; Ultra-Lightweight Personal AI Assistant</p>
+  <p><a href="https://github.com/inematds/nanobot">github.com/inematds/nanobot</a></p>
+</footer>
+
+<script>
+  // Back to top button
+  const btn = document.getElementById('backTop');
+  window.addEventListener('scroll', () => {
+    btn.classList.toggle('visible', window.scrollY > 400);
+  });
+
+  // Active nav highlight with IntersectionObserver
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('nav a[href^="#"]');
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(link => {
+          link.classList.toggle('active',
+            link.getAttribute('href') === '#' + entry.target.id
+          );
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -75% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>
