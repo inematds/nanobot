@@ -3,8 +3,11 @@
 *.pyc
 dist/
 build/
-docs/
+docs/*
 !docs/index.html
+!docs/arquitetura.html
+!docs/instalacao.html
+!docs/docker.html
 !docs/tecnico.html
 *.egg-info/
 *.egg

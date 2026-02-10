@@ -90,6 +90,21 @@
       border-bottom-color: var(--accent);
     }
 
+    nav li a.nav-home {
+      color: #fff;
+      background: var(--accent);
+      border-radius: 4px;
+      padding: 0.4rem 0.9rem;
+      font-weight: 600;
+      border-bottom: 2px solid transparent;
+    }
+
+    nav li a.nav-home:hover {
+      background: var(--accent-hover);
+      color: #fff;
+      border-bottom-color: transparent;
+    }
+
     /* MOBILE NAV TOGGLE */
     .nav-toggle {
       display: none;
@@ -433,7 +448,7 @@
 
 <nav id="navbar">
   <ul>
-    <li><a href="index.html">&larr; Voltar</a></li>
+    <li><a href="index.html" class="nav-home">Inicio</a></li>
     <li><a href="#instalacao">Instalacao</a></li>
     <li><a href="#uso-diario">Uso Diario</a></li>
     <li><a href="#estrutura">Estrutura</a></li>
