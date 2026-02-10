@@ -68,3 +68,13 @@ Read individual rule files for detailed explanations and code examples:
 | [rules/transparent-videos.md](rules/transparent-videos.md) | Rendering with transparency |
 | [rules/trimming.md](rules/trimming.md) | Trimming animations |
 | [rules/videos.md](rules/videos.md) | Embedding videos - trimming, volume, speed, looping |
+
+## Code Examples
+
+Ready-to-use React/TypeScript animation examples:
+
+| Example | Description |
+|---------|-------------|
+| [rules/assets/charts-bar-chart.tsx](rules/assets/charts-bar-chart.tsx) | Animated bar chart with spring physics (Gold Price 2024) |
+| [rules/assets/text-animations-typewriter.tsx](rules/assets/text-animations-typewriter.tsx) | Typewriter effect with blinking cursor and pause |
+| [rules/assets/text-animations-word-highlight.tsx](rules/assets/text-animations-word-highlight.tsx) | Word highlight with spring-animated wipe effect |

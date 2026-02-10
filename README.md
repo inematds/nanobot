@@ -858,6 +858,62 @@ nanobot security-check
 ```
 
 
+## 🧩 Skills (Habilidades do Agente)
+
+O nanobot vem com **skills** — pacotes de conhecimento que o agente carrega conforme necessário.
+Cada skill é uma pasta com um `SKILL.md` (descrição + regras) e opcionalmente scripts e exemplos de código.
+
+### Skills incluídos
+
+| Skill | Descrição | Requer |
+|-------|-----------|--------|
+| **remotion** | Criação de vídeos em React — animações, 3D, áudio, charts, captions, transitions. 35 regras + 3 exemplos de código | `npx` |
+| **agent-browser** | Automação de browser — navegar sites, preencher forms, screenshots, extrair dados | `agent-browser` |
+| **github** | Interação com GitHub via `gh` CLI — issues, PRs, CI runs | `gh` |
+| **summarize** | Resumir/transcrever URLs, podcasts, vídeos do YouTube | `summarize` |
+| **weather** | Clima e previsão do tempo (sem API key) | — |
+| **tmux** | Controle remoto de sessões tmux | `tmux` |
+| **cron** | Agendar lembretes e tarefas recorrentes | — |
+| **skill-creator** | Criar ou atualizar skills do agente | — |
+
+### Remotion Skill (destaque)
+
+O skill de **Remotion** é o mais completo, adaptado do [repositório oficial](https://github.com/remotion-dev/remotion).
+Inclui:
+
+- **35 regras** de referência cobrindo: animações, composições, áudio, 3D (Three.js), charts, captions/legendas, GIFs, Lottie, mapas (Mapbox), fontes, timing/easing, transições, FFmpeg, TailwindCSS e mais
+- **3 exemplos de código** prontos em TypeScript/React:
+  - `charts-bar-chart.tsx` — gráfico de barras animado com spring physics
+  - `text-animations-typewriter.tsx` — efeito typewriter com cursor piscando
+  - `text-animations-word-highlight.tsx` — destaque de palavra com animação wipe
+
+```
+nanobot/skills/remotion/
+├── SKILL.md                              ← Índice e referência rápida
+├── rules/                                ← 35 regras detalhadas
+│   ├── animations.md, timing.md          #   Animações e interpolação
+│   ├── audio.md, audio-visualization.md  #   Áudio e visualização
+│   ├── 3d.md, charts.md, lottie.md       #   Conteúdo visual
+│   ├── subtitles.md, display-captions.md #   Legendas
+│   ├── transitions.md, sequencing.md     #   Transições e sequenciamento
+│   ├── ffmpeg.md, videos.md, images.md   #   Mídia
+│   └── ...                               #   E mais 22 regras
+└── rules/assets/                         ← Exemplos de código (.tsx)
+    ├── charts-bar-chart.tsx
+    ├── text-animations-typewriter.tsx
+    └── text-animations-word-highlight.tsx
+```
+
+> Fonte: [github.com/remotion-dev/remotion](https://github.com/remotion-dev/remotion) (adaptado para formato nanobot)
+> Fork com exemplos: [github.com/inematds/remotion-skills](https://github.com/inematds/remotion-skills)
+
+### Como os skills funcionam
+
+1. O agente lê o `SKILL.md` para entender quando usar o skill
+2. Conforme a conversa, carrega regras específicas (ex: `rules/audio.md` quando o assunto é áudio)
+3. Skills com `requires` verificam se as ferramentas necessárias estão instaladas
+4. Para criar seus próprios skills, use o skill `skill-creator`
+
 ## CLI Reference
 
 | Command | Description |
@@ -969,6 +1025,15 @@ docker run -v ~/.nanobot:/home/nanobot/.nanobot -p 127.0.0.1:18790:18790 --resta
 │   │   ├── agent/              #   🧠 Core agent logic (loop, context, memory, tools)
 │   │   ├── channels/           #   📱 Telegram, Discord, WhatsApp, Feishu, DingTalk
 │   │   ├── providers/          #   🤖 LLM providers (OpenRouter, Anthropic, etc.)
+│   │   ├── skills/             #   🧩 Skills do agente
+│   │   │   ├── remotion/       #     🎬 Vídeo em React (35 regras + exemplos)
+│   │   │   ├── agent-browser/  #     🌐 Automação de browser
+│   │   │   ├── github/         #     🐙 GitHub CLI
+│   │   │   ├── summarize/      #     📝 Resumir URLs e vídeos
+│   │   │   ├── weather/        #     🌤️ Clima
+│   │   │   ├── tmux/           #     🧵 Sessões tmux
+│   │   │   ├── cron/           #     ⏰ Tarefas agendadas
+│   │   │   └── skill-creator/  #     🔧 Criar novos skills
 │   │   ├── bus/                #   🚌 Message routing
 │   │   ├── cron/               #   ⏰ Scheduled tasks
 │   │   ├── heartbeat/          #   💓 Proactive wake-up
@@ -977,7 +1042,8 @@ docker run -v ~/.nanobot:/home/nanobot/.nanobot -p 127.0.0.1:18790:18790 --resta
 │   │   └── cli/                #   🖥️ Commands
 │   ├── bridge/                 ← Bridge WhatsApp (Node.js)
 │   ├── doc/                    ← Documentação
-│   │   └── GUIA_INSTALACAO.md  #   Guia completo para leigos
+│   │   ├── GUIA_INSTALACAO.md  #   Guia completo para leigos
+│   │   └── GUIA_DOCKER.md      #   Guia completo Docker
 │   ├── venv/                   ← Ambiente virtual Python (criado na instalação)
 │   ├── start.sh                ← Script: ativa o venv (usar com source)
 │   ├── help.sh                 ← Script: mostra guia rápido de comandos
