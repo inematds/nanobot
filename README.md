@@ -12,19 +12,6 @@
 
 ⚡️ Delivers core agent functionality in just **~4,000** lines of code.
 
-## 🆕 O que este fork inclui
-
-Adições e melhorias feitas neste repositório sobre o projeto original:
-
-- **Documentação completa em PT-BR** — README, guia de instalação para leigos, guia Docker com comparações
-- **GitHub Pages** — site com documentação de [arquitetura](https://inematds.github.io/nanobot/), [instalação](https://inematds.github.io/nanobot/instalacao.html) e [Docker](https://inematds.github.io/nanobot/docker.html)
-- **Skill Remotion completo** — 35 regras de referência + 3 exemplos de código TSX (bar chart, typewriter, word highlight) adaptados do [remotion-dev/remotion](https://github.com/remotion-dev/remotion) e [inematds/remotion-skills](https://github.com/inematds/remotion-skills)
-- **Scripts auxiliares** — `start.sh` (ativa venv), `help.sh` (guia rápido de comandos)
-- **Aliases .bashrc** — `nb` (ativa ambiente), `nbhelp` (guia rápido)
-- **Diagnóstico** — script `diagnose.py` para identificar problemas de configuração
-- **Troubleshooting** — seção completa com soluções para erros comuns
-- **Configurações em PT-BR** — Telegram, OpenRouter, segurança, tudo documentado passo a passo
-
 ## Key Features of nanobot:
 
 🪶 **Ultra-Lightweight**: Just ~4,000 lines of core agent code — 99% smaller than Clawdbot.
@@ -34,6 +21,19 @@ Adições e melhorias feitas neste repositório sobre o projeto original:
 ⚡️ **Lightning Fast**: Minimal footprint means faster startup, lower resource usage, and quicker iterations.
 
 💎 **Easy-to-Use**: One-click to deploy and you're ready to go.
+
+## 🆕 O que este fork inclui
+
+Adições e melhorias feitas neste repositório sobre o projeto original (~4.400 linhas de documentação adicionadas):
+
+| Adição | Detalhes | Linhas |
+|--------|----------|--------|
+| **README em PT-BR** | Instalação, Quick Start, Troubleshooting, Skills, Docker, tudo em português | 1.068 |
+| **GitHub Pages** | [Arquitetura](https://inematds.github.io/nanobot/) · [Instalação](https://inematds.github.io/nanobot/instalacao.html) · [Docker](https://inematds.github.io/nanobot/docker.html) | 2.858 |
+| **Guias Markdown** | `doc/GUIA_INSTALACAO.md` + `doc/GUIA_DOCKER.md` para leigos | 520 |
+| **Skill Remotion** | 35 regras + 3 exemplos TSX do [remotion-dev](https://github.com/remotion-dev/remotion) e [inematds/remotion-skills](https://github.com/inematds/remotion-skills) | — |
+| **Scripts auxiliares** | `start.sh` (ativa venv), `help.sh` (guia rápido), `diagnose.py` (diagnóstico) | — |
+| **Aliases .bashrc** | `nb` (ativa ambiente), `nbhelp` (guia rápido) | — |
 
 ## 🏗️ Architecture
 
