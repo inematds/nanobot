@@ -440,8 +440,8 @@
     <h3>O que o channel cria</h3>
 <pre><code class="language-python">InboundMessage(
     channel   = "telegram",        # de onde veio
-    sender_id = "7388953786",      # quem mandou
-    chat_id   = "7388953786",      # qual chat
+    sender_id = "123456789",      # quem mandou
+    chat_id   = "123456789",      # qual chat
     content   = "Oi, tudo bem?",   # a mensagem
     media     = [],                # fotos, audios...
 )</code></pre>
@@ -669,11 +669,11 @@ INJECTION = [";", "&&", "||", "|", "`", "$("]
   <section id="sessions">
     <h2><span class="num">7.</span> Sessions &mdash; Historico Salvo</h2>
     <p><strong>Arquivo:</strong> <code>nanobot/session/manager.py</code></p>
-    <p>Cada conversa e uma <strong>sessao</strong> identificada por <code>channel:chat_id</code> (ex: <code>telegram:7388953786</code>).</p>
+    <p>Cada conversa e uma <strong>sessao</strong> identificada por <code>channel:chat_id</code> (ex: <code>telegram:123456789</code>).</p>
     <p>As sessoes ficam salvas como arquivos <code>.jsonl</code> (uma linha JSON por mensagem):</p>
 
 <pre><code>~/.nanobot/sessions/
-+-- telegram_7388953786.jsonl</code></pre>
++-- telegram_123456789.jsonl</code></pre>
 
     <p>Conteudo do arquivo:</p>
 <pre><code class="language-json">{"_type":"metadata","created_at":"2026-02-10T05:30:00"}
@@ -767,7 +767,7 @@ INJECTION = [";", "&&", "||", "|", "`", "$("]
       </div>
       <div class="flow-step" data-step="3">
         <span class="label">AGENT &mdash; Pega da fila</span>
-        <span class="desc"><code>bus.consume_inbound()</code> retira. Busca sessao <code>telegram:7388953786</code>.</span>
+        <span class="desc"><code>bus.consume_inbound()</code> retira. Busca sessao <code>telegram:123456789</code>.</span>
       </div>
       <div class="flow-step" data-step="4">
         <span class="label">CONTEXT &mdash; Monta o prompt</span>
