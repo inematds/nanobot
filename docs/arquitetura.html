@@ -899,6 +899,75 @@ INJECTION = [";", "&&", "||", "|", "`", "$("]
   <!-- MAPA DE ARQUIVOS -->
   <section id="arquivos">
     <h2>Mapa de Arquivos</h2>
+
+    <h3>Estrutura de diretorios do codigo-fonte</h3>
+    <div class="diagram">
+<pre><code>nanobot/                          &larr; Pacote principal Python
++-- __init__.py
++-- __main__.py                   &larr; Entry point (python -m nanobot)
+|
++-- cli/
+|   +-- commands.py               &larr; Todos os comandos CLI (gateway, agent, status...)
+|
++-- agent/                        &larr; Cerebro do sistema
+|   +-- loop.py                   &larr; Motor principal (recebe msg, chama LLM, executa tools)
+|   +-- context.py                &larr; Monta o prompt (bootstrap + memoria + skills + historico)
+|   +-- memory.py                 &larr; Memoria de longo prazo e notas diarias
+|   +-- skills.py                 &larr; Descoberta e carregamento de skills
+|   +-- subagent.py               &larr; Gerencia subagentes em background (max 5)
+|   +-- tools/                    &larr; Ferramentas do agente
+|       +-- registry.py           &larr; Registro central de tools
+|       +-- base.py               &larr; Classe base Tool
+|       +-- filesystem.py         &larr; read_file, write_file, edit_file, list_dir
+|       +-- shell.py              &larr; exec (executa comandos no terminal)
+|       +-- web.py                &larr; web_search, web_fetch
+|       +-- message.py            &larr; message (envia msg ao usuario)
+|       +-- spawn.py              &larr; spawn (cria subagentes)
+|       +-- cron.py               &larr; cron (agenda tarefas)
+|
++-- bus/                          &larr; Fila de mensagens
+|   +-- queue.py                  &larr; MessageBus (asyncio.Queue, max 1000)
+|   +-- events.py                 &larr; InboundMessage, OutboundMessage
+|
++-- channels/                     &larr; Portas de entrada (plataformas)
+|   +-- base.py                   &larr; BaseChannel (seguranca, rate limit)
+|   +-- manager.py                &larr; Gerencia todos os channels ativos
+|   +-- telegram.py               &larr; Canal Telegram (polling)
+|   +-- discord.py                &larr; Canal Discord (WebSocket)
+|   +-- whatsapp.py               &larr; Canal WhatsApp (bridge Node.js)
+|   +-- feishu.py                 &larr; Canal Feishu (WebSocket)
+|   +-- dingtalk.py               &larr; Canal DingTalk (Stream)
+|
++-- providers/                    &larr; Conexao com modelos de IA
+|   +-- base.py                   &larr; Interface base do provider
+|   +-- registry.py               &larr; Registro de providers (auto-detect)
+|   +-- litellm_provider.py       &larr; Provider principal (LiteLLM)
+|   +-- transcription.py          &larr; Transcricao de audio (Whisper/Groq)
+|
++-- config/                       &larr; Configuracao
+|   +-- schema.py                 &larr; Schema Pydantic v2
+|   +-- loader.py                 &larr; Carrega e valida config.json
+|
++-- session/                      &larr; Historico de conversas
+|   +-- manager.py                &larr; SessionManager (JSONL, cache LRU)
+|
++-- cron/                         &larr; Tarefas agendadas
+|   +-- service.py                &larr; Servico de cron (every, cron, at)
+|   +-- types.py                  &larr; Tipos: CronJob, CronSchedule, CronPayload
+|
++-- heartbeat/                    &larr; Wake-up periodico
+|   +-- service.py                &larr; Heartbeat a cada 30 min
+|
++-- security/                     &larr; Seguranca
+|   +-- ratelimit.py              &larr; Token bucket por sessao
+|   +-- validators.py             &larr; Valida paths, filenames, comandos
+|   +-- sanitize.py               &larr; Sanitiza erros e resultados
+|
++-- utils/
+    +-- helpers.py                &larr; Funcoes auxiliares</code></pre>
+    </div>
+
+    <h3>Tabela resumo por componente</h3>
     <table>
       <tr><th>Componente</th><th>Arquivo</th><th>Responsabilidade</th></tr>
       <tr><td>CLI / Entry</td><td><code>cli/commands.py</code></td><td>Todos os comandos, startup do gateway</td></tr>
