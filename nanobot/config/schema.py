@@ -92,6 +92,13 @@ class ProvidersConfig(BaseModel):
     aihubmix: ProviderConfig = Field(default_factory=ProviderConfig)  # AiHubMix API gateway
 
 
+class TranscriptionConfig(BaseModel):
+    """Voice transcription configuration."""
+    provider: str = "groq"  # "groq" | "openai" | "local"
+    model: str = ""  # Model override (local: tiny/base/small/medium/large; openai: whisper-1)
+    language: str = ""  # Optional language hint, e.g. "pt", "en"
+
+
 class GatewayConfig(BaseModel):
     """Gateway/server configuration."""
     host: str = "127.0.0.1"
@@ -128,6 +135,7 @@ class Config(BaseSettings):
     providers: ProvidersConfig = Field(default_factory=ProvidersConfig)
     gateway: GatewayConfig = Field(default_factory=GatewayConfig)
     tools: ToolsConfig = Field(default_factory=ToolsConfig)
+    transcription: TranscriptionConfig = Field(default_factory=TranscriptionConfig)
     
     @property
     def workspace_path(self) -> Path:

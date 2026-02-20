@@ -344,12 +344,54 @@ nanobot agent -m "What is 2+2?"
 # VPS direto (roda em foreground, Ctrl+C para parar)
 nanobot gateway
 
-# VPS direto (roda em background, sobrevive ao fechar o terminal)
-nohup python -m nanobot gateway > ~/.nanobot/gateway.log 2>&1 &
-
 # Docker (já está rodando se usou docker compose up -d)
 docker compose logs -f nanobot
 ```
+
+#### Autostart com systemd (recomendado para VPS)
+
+Crie o serviço para que o nanobot inicie automaticamente no boot e reinicie se crashar:
+
+```bash
+cat > /etc/systemd/system/nanobot.service << 'EOF'
+[Unit]
+Description=nanobot AI Assistant Gateway
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/nanobot
+ExecStart=/root/nanobot/venv/bin/python -m nanobot gateway
+Restart=on-failure
+RestartSec=5
+StandardOutput=append:/root/.nanobot/gateway.log
+StandardError=append:/root/.nanobot/gateway.log
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl enable nanobot.service
+systemctl start nanobot.service
+```
+
+> [!TIP]
+> Com `Restart=on-failure`, o systemd reinicia o nanobot automaticamente se o processo crashar
+> (ex: erro de rede, OOM, etc.). Com `enable`, ele inicia sozinho no boot da VPS.
+
+**Comandos do systemd:**
+
+| O que quer fazer | Comando |
+|------------------|---------|
+| Iniciar | `systemctl start nanobot` |
+| Parar | `systemctl stop nanobot` |
+| Reiniciar | `systemctl restart nanobot` |
+| Ver status | `systemctl status nanobot` |
+| Ver log ao vivo | `journalctl -u nanobot -f` ou `tail -f ~/.nanobot/gateway.log` |
+| Desabilitar autostart | `systemctl disable nanobot` |
 
 ### Passo 6: Verificar segurança
 
@@ -377,24 +419,22 @@ cd /root/nanobot && source venv/bin/activate
 
 ### Comandos rápidos
 
-| O que quer fazer          | Comando |
-|---------------------------|---------|
-| Ver configuração          | `nanobot status` |
-| Ver se está rodando       | `ps aux \| grep 'nanobot gateway'` |
-| Iniciar (foreground)      | `nanobot gateway` |
-| Iniciar (background)      | `nohup python -m nanobot gateway > ~/.nanobot/gateway.log 2>&1 &` |
-| Parar                     | `pkill -f 'nanobot gateway'` |
-| Reiniciar                 | `pkill -f 'nanobot gateway' && sleep 2 && nohup python -m nanobot gateway > ~/.nanobot/gateway.log 2>&1 &` |
-| Ver log ao vivo           | `tail -f ~/.nanobot/gateway.log` |
-| Ver guia rápido           | `bash help.sh` |
+| O que quer fazer          | Comando (systemd) | Comando (manual) |
+|---------------------------|-------------------|------------------|
+| Ver configuração          | `nanobot status` | `nanobot status` |
+| Ver se está rodando       | `systemctl status nanobot` | `ps aux \| grep 'nanobot gateway'` |
+| Iniciar                   | `systemctl start nanobot` | `nanobot gateway` |
+| Parar                     | `systemctl stop nanobot` | `pkill -f 'nanobot gateway'` |
+| Reiniciar                 | `systemctl restart nanobot` | `pkill -f 'nanobot gateway' && nanobot gateway` |
+| Ver log ao vivo           | `journalctl -u nanobot -f` | `tail -f ~/.nanobot/gateway.log` |
+| Ver guia rápido           | `bash help.sh` | `bash help.sh` |
 
 ### Atualizar o código
 
 ```bash
 nb
 git pull && pip install -e .
-pkill -f 'nanobot gateway'
-nohup python -m nanobot gateway > ~/.nanobot/gateway.log 2>&1 &
+systemctl restart nanobot
 ```
 
 ## ❓ Troubleshooting
@@ -1011,7 +1051,7 @@ docker run -v ~/.nanobot:/home/nanobot/.nanobot -p 127.0.0.1:18790:18790 --resta
 |--|-----------|--------|
 | Precisa de venv? | Sim | Não |
 | Precisa ativar ambiente? | Sim (`source`) | Não |
-| Reinicia sozinho? | Não (sem systemd) | Sim |
+| Reinicia sozinho? | Sim (com systemd) | Sim |
 | Limites de recurso | Sem limite | 2GB RAM, 2 CPUs |
 | Segurança | Root direto | Usuário sem privilégios |
 
